@@ -1,9 +1,15 @@
 #!/bin/bash
 
-DOT_FILES=(.zshrc .bashrc .vimrc .tmux.conf .keysnail.js .Xkbmap .emacs)
+# list of files that will not make link
+EXCEPTIONS=(.git README.md setup.sh)
+# list of files that located current directory
+FILES=(`ls -A`)
 
-for file in ${DOT_FILES[@]}
+# remove elements that are in exception list
+FILES=($(comm -23 <(printf "%s\n" "${FILES[@]}") <(printf "%s\n" "${EXCEPTIONS[@]}")))
+
+for FILE in ${FILES[@]}
 do
-  ln -s $HOME/dotfiles/$file $HOME/$file
+  ln -s $PWD/$FILE $HOME/$FILE
 done
 
