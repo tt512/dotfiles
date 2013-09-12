@@ -86,14 +86,16 @@ alias j="jobs -l"
 
 case "${OSTYPE}" in
 freebsd*|darwin*)
-  alias ls="ls -a -G -w -F"
+  alias ls="ls  -G -w -F"
   ;;
 linux*)
-  alias ls="ls -a --color"
+  alias ls="ls --color"
   ;;
 esac
 
-alias ll="ls -al"
+# some more ls aliases
+alias ll='ls -al'
+alias la='ls -AC'
 
 alias du="du -h"
 alias df="df -h"
