@@ -34,7 +34,7 @@ syntax on
 "Tab、行末の半角スペースを明示的に表示する。
 set list
 "set listchars=tab:^\ ,trail:~
-set listchars=tab:>\ ,trail:•,extends:>,precedes:< " 不可視文字の表示形式
+set listchars=tab:>\ ,trail:~,extends:>,precedes:< " 不可視文字の表示形式
 set display=uhex  " 印字不可能文字を16進数で表示
 
 set laststatus=2 "Always appear statusline
@@ -43,12 +43,9 @@ set cursorline "Highlight cursorline
 "set formatoptions+=mM
 
 "□や○の文字があってもカーソル位置がずれないようにする。
-if '&ambiwidth'
-  set ambiwidth=double
-endif
-
+set ambiwidth=double
 "画面最後の行をできる限り表示する。
-"set display+=lastline
+set display+=lastline
 
 " 80桁目をハイライト
 set textwidth=0
@@ -81,31 +78,25 @@ NeoBundle 'Shougo/vimproc', {
       \    },
       \ }
 " }}}
-" My Bundles here:
-"
-" Note: You don't set neobundle setting in .gvimrc!
-" Original repos on github
 NeoBundleLazy 'Shougo/unite.vim', {'autoload': {'commands': 'Unite'}}
 NeoBundleLazy 'Shougo/vimfiler', { 'autoload':
       \ { 'commands': ['VimFiler', 'VimFilerExplorer'] }}
 NeoBundleLazy 'Shougo/vimshell.vim', {'autoload':
       \ {'commands': ['VimShell']}}
-NeoBundle 'supermomonga/vimshell-pure.vim', {'depends' : 'Shougo/vimshell.vim'}
+NeoBundle 'supermomonga/vimshell-pure.vim', {'depends': 'Shougo/vimshell.vim'}
 NeoBundle 'Shougo/neocomplcache'
-"NeoBundle 'Lokaltog/powerline', { 'rtp' : 'powerline/bindings/vim'}
-"NeoBundle 'bling/vim-airline'
 NeoBundle 'itchyny/lightline.vim'
 NeoBundle 'bouzuya/vim-ibus'
 "NeoBundle 'fuenor/im_control.vim'
+NeoBundle 'thinca/vim-template'
+NeoBundle 'thinca/vim-singleton'
 NeoBundle 'scrooloose/syntastic'
 NeoBundleLazy 'thinca/vim-quickrun', {'autoload': {'commands': 'Quickrun'}}
 NeoBundleLazy 'jcf/vim-latex', { 'autoload': { 'filetypes' : ['tex'] }}
-NeoBundle 'mrtazz/simplenote.vim'
-"NeoBundle 'mattn/zencoding-vim'
+NeoBundleLazy 'mrtazz/simplenote.vim', {'autoload': {'commands': 'Simplenote'}}
 NeoBundleLazy 'mattn/emmet-vim', {'autoload': {'filetypes': ['html', 'css']}}
 "NeoBundle 'superbrothers/vim-vimperator'
 NeoBundle 'Shougo/unite-outline'
-"NeoBundle 'mattn/webapi-vim'
 NeoBundle 'vim-jp/vimdoc-ja'
 "NeoBundleLazy 'skammer/vim-css-color', {'autoload': {'filetypes': 'css'}}
 NeoBundleLazy 'lilydjwg/colorizer', {'autoload': {'filetypes': 'css'}}
@@ -234,25 +225,8 @@ let g:neocomplcache_omni_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 " https://github.com/c9s/perlomni.vim
 let g:neocomplcache_omni_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 """ }}}
-" Powerline {{{
-"" escape insert mode immediately
-"if ! has('gui_running')
-"  set ttimeoutlen=10
-"  augroup FastEscape
-"    autocmd!
-"    au InsertEnter * set timeoutlen=0
-"    au InsertLeave * set timeoutlen=1000
-"  augroup END
-"endif
-" }}}
-" airline {{{
-"let g:airline_left_sep = ''
-"let g:airline_left_alt_sep = ''
-"let g:airline_right_sep = ''
-"let g:airline_right_alt_sep = ''
-"let g:airline_branch_prefix = ' '
-"let g:airline_readonly_symbol = ''
-"let g:airline_linecolumn_prefix = ' '
+" vim-singleton {{{
+call singleton#enable()
 " }}}
 " syntastic {{{
 let g:syntastic_mode_map = {
@@ -291,20 +265,20 @@ let g:Tex_ViewRule_ps = 'evince'
 "let g:Tex_ViewRule_ps = 'okular --unique'
 let g:Tex_ViewRule_dvi = 'xdvi -watchfile 1'
 let g:Tex_IgnoredWarnings =
-\"Underfull\n".
-\"Overfull\n".
-\"specifier changed to\n".
-\"You have requested\n".
-\"Missing number, treated as zero.\n".
-\"There were undefined references\n".
-\"Citation %.%# undefined\n".
-\"Command %.%# invalid in math mode\n".
-\"Text page %.%# contains only floats\n"
-\"A float is stuck\n"
-\"Float too large\n"
-\"LaTeX Font Warning:"
-\"Label `' multiply defined."
-\"There were multiply-defined labels."
+      \"Underfull\n".
+      \"Overfull\n".
+      \"specifier changed to\n".
+      \"You have requested\n".
+      \"Missing number, treated as zero.\n".
+      \"There were undefined references\n".
+      \"Citation %.%# undefined\n".
+      \"Command %.%# invalid in math mode\n".
+      \"Text page %.%# contains only floats\n"
+      \"A float is stuck\n"
+      \"Float too large\n"
+      \"LaTeX Font Warning:"
+      \"Label `' multiply defined."
+      \"There were multiply-defined labels."
 
 let g:Tex_IgnoreLevel = 12
 let g:Tex_GotoError = 0
@@ -455,8 +429,3 @@ inoremap <C-a> <Home>
 inoremap <C-e> <End>
 
 " }}}
-" Template
-autocmd BufNewFile *.cpp  0r ~/.vim/template/template.cpp
-autocmd BufNewFile *.pl   0r ~/.vim/template/template.pl
-autocmd BufNewFile *.tex  0r ~/.vim/template/template.tex
-
