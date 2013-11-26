@@ -8,14 +8,10 @@ antigen bundle command-not-found
 antigen bundle rbenv
 antigen bundle nvm
 antigen bundle tmux
-#antigen bundle tmuxinator
 
 # Syntax highlighting bundle.
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-completions --loc=src
-
-# Completion for tmuxinator from original repo.
-antigen bundle aziz/tmuxinator --loc=completion
 
 # Load the theme.
 #antigen theme robbyrussell
