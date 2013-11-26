@@ -12,7 +12,7 @@ antigen bundle tmux
 
 # Syntax highlighting bundle.
 antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle zsh-users/zsh-completions
+antigen bundle zsh-users/zsh-completions --loc=src
 
 # Completion for tmuxinator from original repo.
 antigen bundle aziz/tmuxinator --loc=completion
