@@ -1,0 +1,6 @@
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/emacs-mozc")
+(require 'mozc)
+;; or (load-file "/path/to/mozc.el")
+(set-language-environment "Japanese")
+(setq default-input-method "japanese-mozc")
+(setq mozc-candidate-style 'overlay)
