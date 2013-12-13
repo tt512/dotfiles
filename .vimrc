@@ -35,6 +35,7 @@ set hidden          " switch buffer without saving
 
 "set magic " Special characters have special meaning without backslash
 
+set autochdir " Change directory automatically
 
 if has('persistent_undo')
   set undodir=~/.vim/undo
