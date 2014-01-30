@@ -37,19 +37,26 @@ set hidden          " switch buffer without saving
 
 set autochdir " Change directory automatically
 
+set directory=~/.vim/swap " Directory for the swap file
+
 if has('persistent_undo')
   set undodir=~/.vim/undo
   set undofile
 endif
 
-"au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\""
+" Restore cursor position
+au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 
-autocmd FileType coffee setlocal sw=2 sts=2 ts=2 expandtab
+"autocmd FileType coffee setlocal sw=2 sts=2 ts=2 expandtab
+
+if !exists('loaded_matchit')
+  runtime macros/matchit.vim
+endif
 
 " }}}
 " Appearance {{{
 "set number "行番号表示
-"set nowrap " 折り返さない
+set nowrap " 折り返さない
 syntax on
 set list " Tab、行末の半角スペースを明示的に表示する。
 set listchars=tab:>\ ,trail:~,extends:>,precedes:< " 不可視文字の表示形式
@@ -100,24 +107,30 @@ NeoBundle 'itchyny/lightline.vim'
 "NeoBundle 'bouzuya/vim-ibus'
 NeoBundle 'fuenor/im_control.vim'
 NeoBundle 'thinca/vim-template'
-NeoBundle 'thinca/vim-singleton'
+"NeoBundle 'thinca/vim-singleton'
 NeoBundleLazy 'scrooloose/syntastic',{'autoload':{'commands': 'SyntasticCheck'}}
 NeoBundleLazy 'thinca/vim-quickrun', {'autoload': {'commands': 'Quickrun'}}
-NeoBundleLazy 'jcf/vim-latex', { 'autoload': { 'filetypes' : ['tex'] }}
+"NeoBundleLazy 'jcf/vim-latex', { 'autoload': { 'filetypes' : ['tex'] }}
+NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {'autoload' : {'filetypes' : ['tex']}}
 NeoBundleLazy 'mrtazz/simplenote.vim', {'autoload': {'commands': 'Simplenote'}}
-NeoBundleLazy 'mattn/emmet-vim', {'autoload': {'filetypes': ['html', 'css', 'scss', 'eruby']}}
-""NeoBundle 'superbrothers/vim-vimperator'
+"NeoBundle 'beloglazov/vim-online-thesaurus'
+"NeoBundle 'superbrothers/vim-vimperator'
+NeoBundle 'vim-scripts/bufkill.vim'
+NeoBundle 'tyru/vim-altercmd'
 NeoBundle 'Shougo/unite-outline'
 NeoBundle 'junegunn/vim-easy-align'
 NeoBundle 'tpope/vim-surround'
-NeoBundle 'sjl/gundo.vim'
-NeoBundle 'kchmck/vim-coffee-script'
-"NeoBundle 'beloglazov/vim-online-thesaurus'
-"NeoBundle 'vim-jp/vimdoc-ja'
+NeoBundle 'osyo-manga/vim-over'
+NeoBundleLazy 'mattn/emmet-vim', {'autoload': {'filetypes': ['html', 'css', 'scss', 'eruby']}}
+NeoBundleLazy 'tkztmk/vim-vala', {'autoload': {'filetypes': 'vala'}}
+NeoBundleLazy 'sjl/gundo.vim', {'autoload': {'commands': ['GundoShow', 'GundoToggle']}}
+NeoBundle 'rcmdnk/vim-markdown'
+NeoBundle 'vim-jp/vimdoc-ja'
 " plugins for extra syntax {{{
-""NeoBundleLazy 'skammer/vim-css-color', {'autoload': {'filetypes': 'css'}}
+NeoBundle 'kchmck/vim-coffee-script'
+"NeoBundleLazy 'skammer/vim-css-color', {'autoload': {'filetypes': 'css'}}
 "NeoBundleLazy 'lilydjwg/colorizer', {'autoload': {'filetypes': 'css'}}
-""NeoBundleLazy 'pangloss/vim-javascript', {'autoload': {'filetypes': 'javascript'}}
+"NeoBundleLazy 'pangloss/vim-javascript', {'autoload': {'filetypes': 'javascript'}}
 " }}}
 " neocompl(ete|cache) {{{
 NeoBundleLazy 'Shougo/neocomplete', {
@@ -137,6 +150,7 @@ NeoBundle 'tomasr/molokai'
 "NeoBundle 'jpo/vim-railscasts-theme'
 NeoBundle 'w0ng/vim-hybrid'
 NeoBundle 'altercation/vim-colors-solarized'
+NeoBundle 'hukl/Smyck-Color-Scheme', {'script_type' : 'colors'}
 "}}}
 
 filetype plugin indent on     " Required!
@@ -152,14 +166,21 @@ NeoBundleCheck " Installation check.
 "colorscheme solarized
 
 set t_Co=256
-set background=dark
-"let g:hybrid_use_Xresources = 1
-colorscheme hybrid
-highlight Normal ctermbg=none
+"set background=dark
+""let g:hybrid_use_Xresources = 1
+"colorscheme hybrid
 
 "let g:molokai_original = 1
 "let g:rehash256 = 1
 "colorscheme molokai
+
+"Smyck
+colorscheme smyck
+highlight Folded     ctermbg=0
+highlight CursorLine ctermbg=0
+highlight Visual     ctermbg=8 ctermfg=none
+
+highlight Normal ctermbg=none
 " }}}
 " neocomplete {{{
 if has('lua')
@@ -354,12 +375,16 @@ endif
 "call singleton#enable()
 "" }}}
 " syntastic {{{
-"let g:syntastic_mode_map = {
-"    \  'mode': 'active',
-"    \ 'active_filetypes': ['c++'],
-"    \ 'passive_filetypes': []
-"    \ }
-"" }}}
+let g:syntastic_mode_map = {
+    \  'mode': 'active',
+    \ 'active_filetypes': ['c', 'c++', 'sass', 'ruby'],
+    \ 'passive_filetypes': []
+    \ }
+let g:syntastic_ruby_checkers = ['rubocop']
+let g:syntastic_quiet_warnings = 0
+"let g:syntastic_splint_config_file
+let g:syntastic_c_checkers=['gcc', 'splint']
+" }}}
 " vim-latex {{{
 "let s:bundle = neobundle#get('vim-latex')
 "function! s:bundle.hooks.on_source(bundle)
@@ -408,6 +433,11 @@ endif
   let g:Tex_GotoError = 0
 "endfunction
 "}}}
+" LaTeX-Box {{{
+let g:LatexBox_latexmk_options = "-pdflatex='xelatex -synctex=1 \%O \%S'"
+let g:LatexBox_ignore_warnings
+      \ = ['Underfull', 'Overfull', 'specifier changed to', 'redefine-command']
+" }}}
 " im_control.vim {{{
 " 「日本語入力固定モード」切替キー
 inoremap <silent> <C-\> <C-r>=IMState('FixMode')<CR>
@@ -519,6 +549,43 @@ endfunction " }}}
 " emmet-vim {{{
 let g:user_emmet_settings = {'lang': 'ja'}
 " }}}
+" EasyAlign {{{
+" For visual mode (e.g. vip<Enter>)
+vmap <Enter>   <Plug>(EasyAlign)
+
+" For normal mode, with Vim movement (e.g. <Leader>aip)
+nmap <Leader>a <Plug>(EasyAlign)
+
+let g:easy_align_delimiters = {
+      \ '>': { 'pattern': '>>\|=>\|>' },
+      \ '/': { 'pattern': '//\+\|/\*\|\*/', 'ignore_groups': ['String'] },
+      \ '#': { 'pattern': '#\+', 'ignore_groups': ['String'], 'delimiter_align': 'l' },
+      \ ']': {
+      \     'pattern':       '[[\]]',
+      \     'left_margin':   0,
+      \     'right_margin':  0,
+      \     'stick_to_left': 0
+      \   },
+      \ ')': {
+      \     'pattern':       '[()]',
+      \     'left_margin':   0,
+      \     'right_margin':  0,
+      \     'stick_to_left': 0
+      \   },
+      \ 'd': {
+      \     'pattern': ' \(\S\+\s*[;=]\)\@=',
+      \     'left_margin': 0,
+      \     'right_margin': 0
+      \   }
+      \ }
+" }}}
+" vim-over {{{
+
+" }}}
+" vim-altercmd {{{
+call altercmd#load()
+AlterCommand bd BD
+" }}}
 "" }}}
 " keymapping {{{
 nnoremap <silent> [unite]v :VimFilerExplorer<CR>
@@ -527,7 +594,8 @@ nnoremap <silent> [unite]v :VimFilerExplorer<CR>
 nnoremap j gj
 nnoremap k gk
 
-nnoremap <Space> <PageDown> " スペースでページ送り
+" スペースでページ送り
+"nnoremap <Space> <PageDown>
 
 " emacs like keybinds in insert mode
 inoremap <C-f> <Right>

@@ -17,5 +17,5 @@
 ;;         'japanese-jisx0208
 ;;         '("MigMix 1P-11"."unicode-bmp"))))
 
-(set-frame-font "ricty-11")
-;(set-face-attribute 'default nil :family "Ricty-12" :height 110 :weight 'bold)
+;(set-frame-font "Ricty-11")
+(set-face-attribute 'default nil :family "Ricty" :height 110 :weight 'bold)

@@ -19,5 +19,6 @@
 (load-theme 'wombat t)
 
 ;; language and encoding
-;(set-language-environment 'Japanese)
-(prefer-coding-system 'utf-8)
+;(prefer-coding-system 'utf-8)
+(set-language-environment 'utf-8)
+(set-default-coding-systems 'utf-8)

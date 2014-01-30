@@ -546,3 +546,6 @@ key.setGlobalKey(["C-c", "T"],
     function (ev, arg) {
         ext.exec("twitter-client-tweet-this-page", arg);
     }, "このページのタイトルと URL を使ってつぶやく", true);
+key.setViewKey(['C-x','b'], function (ev, arg) {
+                   ext.exec("tanything", arg);
+               }, "view all tabs", true);
