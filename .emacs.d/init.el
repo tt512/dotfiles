@@ -13,9 +13,11 @@
 (require 'cl)
 (defvar installing-package-list
   '(
+    init-loader
     helm
     auto-complete
     markdown-mode
+    simplenote
     ))
 
 (let ((not-installed (loop for x in installing-package-list
