@@ -1,5 +1,5 @@
 # Language setting
-export LANG=ja_JP.UTF-8
+#export LANG=ja_JP.UTF-8
 
 # Root directory
 export ZSH=$HOME/.zsh
