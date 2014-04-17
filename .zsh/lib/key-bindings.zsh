@@ -11,13 +11,15 @@ bindkey "^n" history-beginning-search-forward-end
 
 function copy-line-as-kill() {
   zle kill-line
-  print -rn $CUTBUFFER | pbcoly
+  print -rn $CUTBUFFER | xclip
 }
+zle -N copy-line-as-kill
+bindkey '^k' copy-line-as-kill
 
 function paste-as-yank() {
-  pbpaste
+  CUTBUFFER=$(xclip -o)
+  zle yank
 }
-
 zle -N paste-as-yank
-bindkey "^y" paste-as-yank
+bindkey '^y' paste-as-yank
 
