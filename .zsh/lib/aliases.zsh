@@ -1,5 +1,12 @@
 # List direcory contents
-alias ls='ls --color=auto'
+case "${OSTYPE}" in
+freebsd*|darwin*)
+  alias ls="ls -G -w"
+  ;;
+linux*)
+  alias ls="ls --color"
+  ;;
+esac
 #alias lsa='ls -lah'
 alias ll='ls -al'
 alias la='ls -AC'
@@ -11,4 +18,9 @@ alias sl=ls # often screw this up
 
 alias g++='g++ -fdiagnostics-color=auto'
 
-gvim () { command gvim --remote-silent "$@" || command gvim "$@"; }
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  #alias vim='/Applications/MacVim.app/Contents/MacOS/Vim "$@"'
+  #alias gvim='/Applications/MacVim.app/Contents/MacOS/mvim "$@"'
+else
+  gvim () { command gvim --remote-silent "$@" || command gvim "$@"; }
+fi
