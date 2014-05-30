@@ -1,0 +1,6 @@
+[user]
+	name = tatarhy
+	email = tat.j.kikyo@gmail.com
+[alias]
+	lg = log --graph --decorate --oneline
+	co = checkout
