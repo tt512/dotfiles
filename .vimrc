@@ -100,19 +100,22 @@ NeoBundle 'Shougo/vimproc', {
 "NeoBundleLazy 'thinca/vim-quickrun', {'autoload': {'commands': 'Quickrun'}}
 "NeoBundleLazy 'jcf/vim-latex', { 'autoload': { 'filetypes' : ['tex'] }}
 "NeoBundle 'beloglazov/vim-online-thesaurus'
+NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'itchyny/lightline.vim'
+NeoBundle 'digitaltoad/vim-jade', {'autoload':{'filetypes':['jade']}}
 NeoBundle 'fweep/vim-zsh-path-completion'
 NeoBundle 'thinca/vim-template'
 NeoBundle 'scrooloose/syntastic'
 NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {'autoload' : {'filetypes' : ['tex']}}
 NeoBundle 'junegunn/vim-easy-align'
 NeoBundle 'tpope/vim-surround'
-NeoBundle 'rhysd/vim-clang-format'
+"NeoBundle 'rhysd/vim-clang-format'
 NeoBundleLazy 'mattn/emmet-vim', {'autoload': {'filetypes': ['html', 'css', 'scss', 'eruby']}}
 NeoBundleLazy 'sjl/gundo.vim', {'autoload': {'commands': ['GundoShow', 'GundoToggle']}}
 NeoBundle 'rcmdnk/vim-markdown'
 NeoBundle 'vim-jp/vimdoc-ja'
 NeoBundleLazy 'tkztmk/vim-vala', {'autoload': {'filetypes': 'vala'}}
+"NeoBundleLazy 'jiangmiao/simple-javascript-indenter', {'autoload': {'filetypes': 'javascript'}}
 "NeoBundle 'kchmck/vim-coffee-script'
 "NeoBundleLazy 'skammer/vim-css-color', {'autoload': {'filetypes': 'css'}}
 "NeoBundleLazy 'lilydjwg/colorizer', {'autoload': {'filetypes': 'css'}}
@@ -154,11 +157,11 @@ set t_Co=256
 
 "Smyck
 colorscheme smyck
-highlight Folded     ctermbg=0
-highlight CursorLine ctermbg=0
-highlight Visual     ctermbg=8 ctermfg=none
-
-highlight Normal ctermbg=none
+"highlight Folded     ctermbg=0
+"highlight CursorLine ctermbg=0
+"highlight Visual     ctermbg=8 ctermfg=none
+"
+"highlight Normal ctermbg=none
 " }}}
 " lightline {{{
 let g:lightline = {
@@ -179,6 +182,9 @@ let g:lightline = {
 let g:user_emmet_settings = {'lang': 'ja'}
 " }}}
 " LaTeX-Box {{{
+let g:tex_flavor = 'latex'
+let g:LatexBox_output_type = 'pdf'
+let g:LatexBox_viewer = 'xdg-open'
 let g:LatexBox_latexmk_options = "-pdflatex='xelatex -synctex=1 \%O \%S'"
 let g:LatexBox_ignore_warnings
       \ = ['Underfull', 'Overfull', 'specifier changed to', 'redefine-command']
@@ -186,7 +192,7 @@ let g:LatexBox_ignore_warnings
 " syntastic {{{
 let g:syntastic_mode_map = {
     \ 'mode': 'active',
-    \ 'active_filetypes': ['c', 'c++', 'sass', 'ruby', 'vala'],
+    \ 'active_filetypes': ['c', 'c++', 'sass', 'ruby', 'vala', 'javascript'],
     \ 'passive_filetypes': []
     \ }
 "let g:syntastic_quiet_warnings = 0
