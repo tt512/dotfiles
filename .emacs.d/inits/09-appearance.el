@@ -19,7 +19,20 @@
  
 ;(set-frame-font "TakaoGothic-11")
 ;(set-frame-font "Ricty-11")
-(set-face-attribute 'default nil :family "Ricty" :height 110 :weight 'normal)
+
+;; Font setting
+(cond ((eq system-type 'linux)
+       (set-face-attribute 'default nil
+                           :family "Ricty"
+                           :height 110
+                           :weight 'normal))
+
+      ((eq system-type 'darwin)
+       (set-face-attribute 'default nil
+                           :family "Menlo"
+                           :height 110)
+       (set-fontset-font nil 'japanese-jisx0208
+                         (font-spec :family "Hiragino Kaku Gothic ProN"))))
 
 ; theme
 (load-theme 'wombat t)
