@@ -4,3 +4,5 @@
 [alias]
 	lg = log --graph --decorate --oneline
 	co = checkout
+[core]
+	excludesfile = /Users/tat/.global_ignore
