@@ -102,7 +102,6 @@ NeoBundle 'Shougo/vimproc', {
 "NeoBundle 'beloglazov/vim-online-thesaurus'
 NeoBundle 'kien/ctrlp.vim'
 NeoBundle 'itchyny/lightline.vim'
-NeoBundle 'digitaltoad/vim-jade', {'autoload':{'filetypes':['jade']}}
 NeoBundle 'fweep/vim-zsh-path-completion'
 NeoBundle 'thinca/vim-template'
 NeoBundle 'scrooloose/syntastic'
@@ -111,10 +110,12 @@ NeoBundle 'junegunn/vim-easy-align'
 NeoBundle 'tpope/vim-surround'
 "NeoBundle 'rhysd/vim-clang-format'
 NeoBundleLazy 'mattn/emmet-vim', {'autoload': {'filetypes': ['html', 'css', 'scss', 'eruby']}}
-NeoBundleLazy 'sjl/gundo.vim', {'autoload': {'commands': ['GundoShow', 'GundoToggle']}}
-NeoBundle 'rcmdnk/vim-markdown'
+"NeoBundleLazy 'sjl/gundo.vim', {'autoload': {'commands': ['GundoShow', 'GundoToggle']}}
 NeoBundle 'vim-jp/vimdoc-ja'
+NeoBundle 'plasticboy/vim-markdown'
+NeoBundle 'honza/dockerfile.vim'
 NeoBundleLazy 'tkztmk/vim-vala', {'autoload': {'filetypes': 'vala'}}
+NeoBundle 'digitaltoad/vim-jade', {'autoload':{'filetypes':['jade']}}
 "NeoBundleLazy 'jiangmiao/simple-javascript-indenter', {'autoload': {'filetypes': 'javascript'}}
 "NeoBundle 'kchmck/vim-coffee-script'
 "NeoBundleLazy 'skammer/vim-css-color', {'autoload': {'filetypes': 'css'}}
