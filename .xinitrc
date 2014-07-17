@@ -23,16 +23,18 @@ done
 #setxkbmap -option ctrl:swapcaps
 #xmodmap -e "keycode 102 = Super_L"
 
-# exec gnome-session
-# exec startkde
-# exec startxfce4
-# ...or the Window Manager of your choice
+export GTK_IM_MODULE=fcitx
+export XMODIFIERS="@im=fcitx"
+export QT_IM_MODULE=fcitx
+fcitx
 
-export GTK_IM_MODULE=ibus
-export XMODIFIERS=@im=ibus
-export QT_IM_MODULE=ibus
-ibus-daemon -d -x
 skype &
 dropboxd &
 
-exec $1
+# exec gnome-session
+# exec startkde
+# ...or the Window Manager of your choice
+
+exec awesome
+#exec xmonad
+#exec $1
