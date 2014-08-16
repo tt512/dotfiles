@@ -1,0 +1,19 @@
+---
+- tasks:
+    - name: Check whether packer installed
+      command: which packer
+      register: packer_installed
+    - name: Install dependencies for packer
+      pacman: jshon,expac,git
+      sudo: yes
+      when: not packer_installed
+    - name: Download PKGBUILD
+      get_url: dest=/tmp url=https://aur.archlinux.org/packages/pa/packer/PKGBUILD
+      when: not packer_installed
+    - name: Build packer
+      command: makepkg chdir=/tmp
+      when: not packer_installed
+    - name: Install packer
+      command: pacman -U packer-*.pkg.tar.xz chdir=/tmp
+      sudo: yes
+      when: not packer_installed
