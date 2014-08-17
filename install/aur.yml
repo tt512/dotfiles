@@ -1,0 +1,8 @@
+- hosts: 127.0.0.1
+  tasks:
+    - name: Install Dropbox daemon
+      command: packer -S --noconfirm dropbox
+      sudo: yes
+    - name: Install ricty font
+      command: packer -S --noconfirm ttf-ricty
+      sudo: yes
