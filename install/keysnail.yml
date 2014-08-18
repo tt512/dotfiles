@@ -1,0 +1,10 @@
+---
+- hosts: 127.0.0.1
+  vars:
+    - ansible_python_interpreter: /usr/bin/python2
+  tasks:
+    - name: Download keysnail.xpi
+      get_url: dest=/tmp url=https://raw.githubusercontent.com/mooz/keysnail/master/keysnail.xpi
+    - name: Install keysnail to firefox
+      command: firefox keysnail.xpi chdir=/tmp
+
