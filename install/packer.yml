@@ -1,19 +1,23 @@
 ---
-- tasks:
+- hosts: archnote
+  vars:
+    - ansible_python_interpreter: /usr/bin/python2
+  tasks:
     - name: Check whether packer installed
-      command: which packer
+      command: pacman -Qi packer
       register: packer_installed
+      ignore_errors: True
     - name: Install dependencies for packer
-      pacman: jshon,expac,git
+      pacman: name=jshon,expac,git
       sudo: yes
-      when: not packer_installed
+      when: packer_installed|failed
     - name: Download PKGBUILD
       get_url: dest=/tmp url=https://aur.archlinux.org/packages/pa/packer/PKGBUILD
-      when: not packer_installed
+      when: packer_installed|failed
     - name: Build packer
-      command: makepkg chdir=/tmp
-      when: not packer_installed
+      command: makepkg -f chdir=/tmp
+      when: packer_installed|failed
     - name: Install packer
-      command: pacman -U packer-*.pkg.tar.xz chdir=/tmp
+      shell: pacman -U packer-*.pkg.tar.xz --noconfirm chdir=/tmp
       sudo: yes
-      when: not packer_installed
+      when: packer_installed|failed
