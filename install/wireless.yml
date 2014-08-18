@@ -1,0 +1,8 @@
+---
+- hosts: archletsnote
+  user: root
+  vars:
+    - ansible_python_interpreter: /usr/bin/python2
+  tasks:
+    - pacman: name=iw,wpa_supplicant
+#    - copy: src=example.comf dest=/etc/wpa_supplicant/example.conf
