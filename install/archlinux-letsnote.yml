@@ -1,5 +1,7 @@
 ---
 - hosts: 127.0.0.1
+  vars:
+    - ansible_python_interpreter: /usr/bin/python2
   tasks:
     - name: pacman -Syy
       pacman: update_cache=yes
@@ -50,8 +52,16 @@
       sudo: yes
     - name: Set X keyboard layout
       command: localectl set-x11-keymap us pc104 ,dvorak ctrl:swapcaps
+      sudo: yes
 
     - name: Install firefox
       pacman: name=firefox,flashplugin
+      sudo: yes
     - pacman: name=zathura,zathura-pdf-mupdf
+      sudo: yes
     - pacman: name=alsa-utils
+      sudo: yes
+
+    - name: Setup .gitconfig
+      file: src=~/dotfiles/.gitconfig dest=~/.gitconfig state=link
+
