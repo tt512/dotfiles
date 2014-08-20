@@ -6,25 +6,6 @@
     - name: pacman -Syy
       pacman: update_cache=yes
       sudo: yes
-    - name: Install Xorg
-      pacman: name=xorg-server,xorg-server-utils,xorg-xinit,mesa,xf86-video-intel,xf86-input-synaptics,xterm,xclip
-      sudo: yes
-    - name: Setup X setting files
-      file: src=~/dotfiles/{{item.path}} dest=~/{{item.dest}} state=link
-      with_items:
-        - { path: '.xinitrc', dest: '.xinitrc' }
-        - { path: '.Xresources.d', dest: '.Xresources.d' }
-    - name: Install awesome wm
-      pacman: name=awesome,rxvt-unicode
-      sudo: yes
-    - file: path=~/.config state=directory
-    - file: src=~/dotfiles/config/awesome dest=~/.config/awesome state=link
-    - name: Install fonts
-      pacman: name=ttf-dejavu,ttf-liberation,otf-ipafont
-      sudo: yes
-    - name: Install fcitx-mozc
-      pacman: name=fcitx-im,fcitx-configtool,fcitx-mozc
-      sudo: yes
 
     - name: Install vim
       pacman: name=gvim
@@ -41,18 +22,6 @@
       sudo: yes
     - name: Setup emacs.d
       file: src=~/dotfiles/.emacs.d dest=~/.emacs.d state=link
-
-    - name: Install slim
-      pacman: name=slim
-      sudo: yes
-    - name: Edit slim.conf
-      command: patch slim.conf.patch
-    - name: Enable slim
-      service: name=slim enabled=yes
-      sudo: yes
-    - name: Set X keyboard layout
-      command: localectl set-x11-keymap us pc104 ,dvorak ctrl:swapcaps
-      sudo: yes
 
     - name: Install firefox
       pacman: name=firefox,flashplugin
