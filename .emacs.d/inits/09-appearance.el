@@ -11,21 +11,16 @@
 ;; 折り返さない
 ;(setq-default truncate-lines 1)
  
-;; (cond (window-system
-;;     (set-default-font "Monospace-11")
-;;     (set-fontset-font (frame-parameter nil 'font)
-;;         'japanese-jisx0208
-;;         '("MigMix 1P-11"."unicode-bmp"))))
- 
 ;(set-frame-font "TakaoGothic-11")
-;(set-frame-font "Ricty-11")
 
 ;; Font setting
 (cond ((eq system-type 'linux)
        (set-face-attribute 'default nil
-                           :family "Ricty"
+                           :family "Source Code Pro"
                            :height 110
-                           :weight 'normal))
+                           :weight 'normal)
+       (set-fontset-font nil 'japanese-jisx0208
+                         (font-spec :family "Source Han Sans JP")))
 
       ((eq system-type 'darwin)
        (set-face-attribute 'default nil
