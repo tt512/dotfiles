@@ -10,8 +10,7 @@
 ""カーソルを行頭、行末で止まらないようにする
 "set whichwrap=b,s,h,l,<,>,[,]
 "set backspace=2 "改行を削除できるように
-set encoding=utf-8 "デフォルトエンコーディング
-" 文字コードの自動認識
+set encoding=utf-8
 set fileencodings=utf-8,cp932,iso-2022-jp,euc-jp,default,latin
 set foldmethod=marker
 set clipboard=unnamedplus,unnamed,autoselect
@@ -24,9 +23,12 @@ set wildignorecase
 set ignorecase
 set smartcase
 
-set expandtab
-set tabstop=2
-set shiftwidth=0 " use tabstop value
+" Default indent level
+set expandtab tabstop=2 shiftwidth=2
+
+" for D language
+au BufNewFile,BufRead *.d set expandtab tabstop=4 shiftwidth=4
+
 " Do not insert space when joining multibyte lines
 set formatoptions+=mM
 set formatoptions+=j " remove a comment leader
@@ -55,8 +57,6 @@ endif
 
 " }}}
 " Appearance {{{
-"set number "行番号表示
-set nowrap " 折り返さない
 syntax on
 set list " Tab、行末の半角スペースを明示的に表示する。
 set listchars=tab:>\ ,trail:~,extends:>,precedes:< " 不可視文字の表示形式
@@ -98,29 +98,32 @@ NeoBundle 'Shougo/vimproc', {
       \ }
 " }}}
 "NeoBundleLazy 'thinca/vim-quickrun', {'autoload': {'commands': 'Quickrun'}}
-"NeoBundleLazy 'jcf/vim-latex', { 'autoload': { 'filetypes' : ['tex'] }}
 "NeoBundle 'beloglazov/vim-online-thesaurus'
 NeoBundle 'kien/ctrlp.vim'
+NeoBundleLazy 'Shougo/unite.vim', {'autoload': {
+      \ 'commands': ['Unite', 'UniteWithCurrentDir', 'UniteWithBufferDir']}}
 NeoBundle 'itchyny/lightline.vim'
-NeoBundle 'fweep/vim-zsh-path-completion'
+"NeoBundle 'fweep/vim-zsh-path-completion'
 NeoBundle 'thinca/vim-template'
 NeoBundle 'scrooloose/syntastic'
 NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {'autoload' : {'filetypes' : ['tex']}}
 NeoBundle 'junegunn/vim-easy-align'
 NeoBundle 'tpope/vim-surround'
 "NeoBundle 'rhysd/vim-clang-format'
-NeoBundleLazy 'mattn/emmet-vim', {'autoload': {'filetypes': ['html', 'css', 'scss', 'eruby']}}
+NeoBundleLazy 'mattn/emmet-vim', {'autoload': {
+      \ 'filetypes': ['html', 'css', 'scss', 'eruby']}}
 "NeoBundleLazy 'sjl/gundo.vim', {'autoload': {'commands': ['GundoShow', 'GundoToggle']}}
 NeoBundle 'vim-jp/vimdoc-ja'
+NeoBundleLazy 'gregsexton/MatchTag', {'autoload': {'filetypes': ['html']}}
 NeoBundle 'plasticboy/vim-markdown'
 NeoBundle 'honza/dockerfile.vim'
 NeoBundleLazy 'tkztmk/vim-vala', {'autoload': {'filetypes': 'vala'}}
-NeoBundle 'digitaltoad/vim-jade', {'autoload':{'filetypes':['jade']}}
+NeoBundleLazy 'digitaltoad/vim-jade', {'autoload':{'filetypes':['jade']}}
 "NeoBundleLazy 'jiangmiao/simple-javascript-indenter', {'autoload': {'filetypes': 'javascript'}}
 "NeoBundle 'kchmck/vim-coffee-script'
 "NeoBundleLazy 'skammer/vim-css-color', {'autoload': {'filetypes': 'css'}}
 "NeoBundleLazy 'lilydjwg/colorizer', {'autoload': {'filetypes': 'css'}}
-"NeoBundleLazy 'pangloss/vim-javascript', {'autoload': {'filetypes': 'javascript'}}
+NeoBundleLazy 'pangloss/vim-javascript', {'autoload': {'filetypes': 'javascript'}}
 NeoBundleLazy 'Shougo/neocomplete', {
       \ 'depends':     ['Shougo/neosnippet', 'Shougo/context_filetype.vim'],
       \ 'disabled':    !has('lua'),
@@ -327,57 +330,105 @@ endif
 "    let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 "  endfunction
 "" }}}
-"" vim-latex {{{
-""let s:bundle = neobundle#get('vim-latex')
-""function! s:bundle.hooks.on_source(bundle)
-"  filetype plugin on
-"  set shellslash
-"  set grepprg=grep\ -nH\ $*
-"  filetype indent on
-"  let g:tex_flavor='latex'
-"  let g:Imap_UsePlaceHolders = 1
-"  let g:Imap_DeleteEmptyPlaceHolders = 1
-"  let g:Imap_StickyPlaceHolders = 0
-"  let g:Tex_DefaultTargetFormat = 'pdf'
-"  " dependency chain: .tex -> .pdf
-"  let g:Tex_FormatDependency_pdf = 'pdf'
-"  let g:Tex_FormatDependency_ps = 'ps'
-"  let g:Tex_CompileRule_pdf = 'xelatex -synctex=1 -interaction=nonstopmode -file-line-error-style $*'
-"  "let g:Tex_CompileRule_pdf = 'xelatex -synctex=1 -interaction=nonstopmode $*'
-"  let g:Tex_BibtexFlavor = 'pbibtex'
-"  "let g:Tex_BibtexFlavor = 'upbibtex'
-"  "let g:Tex_BibtexFlavor = 'bibtex'
-"  "let g:Tex_BibtexFlavor = 'bibtexu'
-"  let g:Tex_MakeIndexFlavor = 'mendex $*.idx'
-"  "let g:Tex_MakeIndexFlavor = 'makeindex $*.idx'
-"  "let g:Tex_MakeIndexFlavor = 'texindy $*.idx'
-"  let g:Tex_UseEditorSettingInDVIViewer = 1
-"  let g:Tex_ViewRule_pdf = 'evince'
-"  let g:Tex_ViewRule_ps = 'evince'
-"  let g:Tex_ViewRule_dvi = 'xdvi -watchfile 1'
-"  let g:Tex_IgnoredWarnings =
-"        \"Underfull\n".
-"        \"Overfull\n".
-"        \"specifier changed to\n".
-"        \"You have requested\n".
-"        \"Missing number, treated as zero.\n".
-"        \"There were undefined references\n".
-"        \"Citation %.%# undefined\n".
-"        \"Command %.%# invalid in math mode\n".
-"        \"Text page %.%# contains only floats\n"
-"        \"A float is stuck\n"
-"        \"Float too large\n"
-"        \"LaTeX Font Warning:"
-"        \"Label `' multiply defined."
-"        \"There were multiply-defined labels."
-"
-"  let g:Tex_IgnoreLevel = 12
-"  let g:Tex_GotoError = 0
-""endfunction
-""}}}
+" Unite {{{
+" Like ctrlp.vim settings.
+let g:unite_force_overwrite_statusline = 0
+call unite#custom#profile('default', 'context', {
+\   'start_insert': 1,
+\   'winheight': 10,
+\   'direction': 'botright',
+\   'prompt': '>>> ',
+\ })
+
+autocmd FileType unite call s:unite_my_settings()
+function! s:unite_my_settings() "{{{
+  " Overwrite settings.
+
+  imap <buffer> jj      <Plug>(unite_insert_leave)
+  "imap <buffer> <C-w>     <Plug>(unite_delete_backward_path)
+
+  imap <buffer><expr> j unite#smart_map('j', '')
+  imap <buffer> <TAB>   <Plug>(unite_select_next_line)
+  imap <buffer> <C-w>     <Plug>(unite_delete_backward_path)
+  imap <buffer> '     <Plug>(unite_quick_match_default_action)
+  nmap <buffer> '     <Plug>(unite_quick_match_default_action)
+  imap <buffer><expr> x
+          \ unite#smart_map('x', "\<Plug>(unite_quick_match_choose_action)")
+  nmap <buffer> x     <Plug>(unite_quick_match_choose_action)
+  nmap <buffer> <C-z>     <Plug>(unite_toggle_transpose_window)
+  imap <buffer> <C-z>     <Plug>(unite_toggle_transpose_window)
+  imap <buffer> <C-y>     <Plug>(unite_narrowing_path)
+  nmap <buffer> <C-y>     <Plug>(unite_narrowing_path)
+  nmap <buffer> <C-j>     <Plug>(unite_toggle_auto_preview)
+  nmap <buffer> <C-r>     <Plug>(unite_narrowing_input_history)
+  imap <buffer> <C-r>     <Plug>(unite_narrowing_input_history)
+  nnoremap <silent><buffer><expr> l
+          \ unite#smart_map('l', unite#do_action('default'))
+
+  let unite = unite#get_current_unite()
+  if unite.profile_name ==# 'search'
+    nnoremap <silent><buffer><expr> r     unite#do_action('replace')
+  else
+    nnoremap <silent><buffer><expr> r     unite#do_action('rename')
+  endif
+
+  nnoremap <silent><buffer><expr> cd     unite#do_action('lcd')
+  nnoremap <buffer><expr> S      unite#mappings#set_current_filters(
+          \ empty(unite#mappings#get_current_filters()) ?
+          \ ['sorter_reverse'] : [])
+
+  " Runs "split" action by <C-s>.
+  imap <silent><buffer><expr> <C-s>     unite#do_action('split')
+endfunction "}}}
+
+if executable('jvgrep')
+  " For jvgrep.
+  let g:unite_source_grep_command = 'jvgrep'
+  let g:unite_source_grep_default_opts = '-i --exclude ''\.(git|svn|hg|bzr)'''
+  let g:unite_source_grep_recursive_opt = '-R'
+endif
+
+" For ack.
+if executable('ack-grep')
+  " let g:unite_source_grep_command = 'ack-grep'
+  " let g:unite_source_grep_default_opts = '-i --no-heading --no-color -k -H'
+  " let g:unite_source_grep_recursive_opt = ''
+endif
+
+" }}}
+" CtrlP {{{
+let g:ctrlp_cmd = 'CtrlPBuffer'
+"if executable('ag')
+"  let g:ctrlp_use_caching = 0
+"  let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
+"endif
+" }}}
 "" }}}
 " keymapping {{{
-"nnoremap <silent> [unite]v :VimFilerExplorer<CR>
+
+" The prefix key.
+nnoremap    [unite]   <Nop>
+nmap    <Space> [unite]
+
+nnoremap <silent> [unite]c  :<C-u>UniteWithCurrentDir
+        \ -buffer-name=files buffer bookmark file<CR>
+nnoremap <silent> [unite]b  :<C-u>UniteWithBufferDir
+        \ -buffer-name=files -prompt=%\  buffer bookmark file<CR>
+nnoremap <silent> [unite]r  :<C-u>Unite
+        \ -buffer-name=register register<CR>
+nnoremap <silent> [unite]o  :<C-u>Unite outline<CR>
+nnoremap <silent> [unite]f
+        \ :<C-u>Unite -buffer-name=resume resume<CR>
+nnoremap <silent> [unite]ma
+        \ :<C-u>Unite mapping<CR>
+nnoremap <silent> [unite]me
+        \ :<C-u>Unite output:message<CR>
+nnoremap  [unite]f  :<C-u>Unite source<CR>
+
+nnoremap <silent> [unite]s
+        \ :<C-u>Unite -buffer-name=files -no-split
+        \ jump_point file_point buffer_tab
+        \ file_rec:! file file/new<CR>
 
 " カーソルを表示行で移動
 nnoremap j gj
