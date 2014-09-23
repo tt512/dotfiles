@@ -52,7 +52,7 @@
 #  local hbar="${PR_FILLBAR}"
 #
 ##PROMPT="%F{magenta}[%@]%f  %F{yellow}[${pwdstr}]%f ${PR_FILLBAR} %F{green}[${user}]%f
-PROMPT="%F{magenta}[%@]%f  %F{yellow}[%~]%f %F{green}[%n@%m]%f
+PROMPT="%F{magenta}[%@]%f %F{yellow}[%~]%f %F{green}[%n@%m]%f
 %B%F{cyan}%#%f%b "
 #}
 #
