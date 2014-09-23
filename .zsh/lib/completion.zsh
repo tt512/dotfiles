@@ -14,6 +14,10 @@ setopt nolistbeep        # no beep sound when complete list displayed
 
 #zmodload -i zsh/complist
 
+# Use caching so that commands like apt and dpkg complete are useable
+zstyle ':completion::complete:*' use-cache 1
+zstyle ':completion::complete:*' cache-path $HOME/.cache/zsh
+
 # case-insensitive (all),partial-word and then substring completion
 if [ "x$CASE_SENSITIVE" = "xtrue" ]; then
   zstyle ':completion:*' matcher-list 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
@@ -59,10 +63,6 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-
 #)
 #zstyle ':completion:*:hosts' hosts $hosts
 #zstyle ':completion:*' users off
-
-# Use caching so that commands like apt and dpkg complete are useable
-zstyle ':completion::complete:*' use-cache 1
-zstyle ':completion::complete:*' cache-path $ZSH/cache/
 
 ## Don't complete uninteresting users
 #zstyle ':completion:*:*:*:users' ignored-patterns \
