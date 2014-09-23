@@ -8,3 +8,8 @@ endif
 " window size
 set lines=35 " width
 set columns=100 " height
+
+
+if has('gui_macvim')
+  set transparency=5
+endif
