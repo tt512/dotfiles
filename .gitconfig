@@ -6,3 +6,5 @@
 	co = checkout
 [core]
 	excludesfile = /Users/tat/.global_ignore
+[push]
+	default = simple
