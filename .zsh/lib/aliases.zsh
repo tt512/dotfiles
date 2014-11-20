@@ -24,3 +24,10 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
   gvim () { command gvim --remote-silent "$@" || command gvim "$@"; }
 fi
+
+# colordiff
+if [[ -x `which colordiff` ]]; then
+  alias diff='colordiff -u'
+else
+  alias diff='diff -u'
+fi
