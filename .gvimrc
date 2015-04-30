@@ -2,7 +2,8 @@ set guioptions=acei
 "set guioptions+=c " Use console dialogs
 "set guifont=Droid\ Sans\ Mono\ 10
 if has('gui_gtk2')
-  set guifont=Ricty\ 10,Droid\ Sans\ Mono\ 10
+  set guifont=Source\ Code\ Pro\ 9
+  set guifontwide=Source\ Han\ Sans\ JP\ 9
 endif
 
 " window size

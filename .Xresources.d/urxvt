@@ -73,7 +73,8 @@
 ! Select the fonts to be used. This is a comma separated list of font
 ! URxvt*font: fontlist
 !URxvt*font: xft:Inconsolata:pixelsize=18
-URxvt*font: xft:Ricty:size=11
+URxvt*font: xft:Source Code Pro:pixelsize=11,\
+            xft:Source Han Sans JP
 ! URxvt*boldFont: fontlist
 ! URxvt*italicFont: fontlist
 ! The font list to use for displaying bold, italic or bold italic

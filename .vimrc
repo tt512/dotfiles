@@ -56,6 +56,31 @@ if !exists('loaded_matchit')
 endif
 
 " }}}
+" Bundler {{{
+call plug#begin('~/.vim/bundle')
+Plug 'kien/ctrlp.vim'
+Plug 'itchyny/lightline.vim'
+Plug 'Shougo/neocomplete'
+"Plug 'thinca/vim-quickrun', {'autoload': {'on': 'Quickrun'}}
+"Plug 'beloglazov/vim-online-thesaurus'
+"Plug 'fweep/vim-zsh-path-completion'
+Plug 'scrooloose/syntastic'
+"Plug 'LaTeX-Box-Team/LaTeX-Box', {'for' : 'tex'}
+Plug 'junegunn/vim-easy-align'
+Plug 'tpope/vim-surround'
+"Plug 'rhysd/vim-clang-format'
+Plug 'mattn/emmet-vim', { 'for': ['html', 'css', 'scss', 'eruby'] }
+"Plug 'sjl/gundo.vim', { 'on': ['GundoShow', 'GundoToggle'] }
+Plug 'vim-jp/vimdoc-ja'
+Plug 'gregsexton/MatchTag', { 'for': 'html' }
+Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
+"Plug 'tomasr/molokai'
+"Plug 'w0ng/vim-hybrid'
+"Plug 'altercation/vim-colors-solarized'
+Plug 'morhetz/gruvbox'
+Plug 'jpo/vim-railscasts-theme'
+call plug#end()
+""" }}}
 " Appearance {{{
 syntax on
 set list " Tab、行末の半角スペースを明示的に表示する。
@@ -74,99 +99,14 @@ set display+=lastline
 setlocal textwidth=0
 if exists('&colorcolumn')
   setlocal colorcolumn=+1
-  autocmd FileType sh,c,cpp,perl,vim,ruby,python,haskell,scheme setlocal textwidth=80
+  autocmd FileType * setlocal textwidth=80
 endif
-" }}}
-" Plugins {{{
-" NeoBundle {{{
-" neobundle settings {{{
-if has('vim_starting')
-  set runtimepath+=~/.vim/bundle/neobundle.vim/
-endif
-" Initialize neobundle.vim
-call neobundle#rc(expand('~/.vim/bundle/'))
-" Let NeoBundle manage NeoBundle
-NeoBundleFetch 'Shougo/neobundle.vim'
-" Update and build automatically
-NeoBundle 'Shougo/vimproc', {
-      \ 'build' : {
-      \     'windows' : 'make -f make_mingw32.mak',
-      \     'cygwin' : 'make -f make_cygwin.mak',
-      \     'mac' : 'make -f make_mac.mak',
-      \     'unix' : 'make -f make_unix.mak',
-      \    },
-      \ }
-" }}}
-"NeoBundleLazy 'thinca/vim-quickrun', {'autoload': {'commands': 'Quickrun'}}
-"NeoBundle 'beloglazov/vim-online-thesaurus'
-NeoBundle 'kien/ctrlp.vim'
-NeoBundleLazy 'Shougo/unite.vim', {'autoload': {
-      \ 'commands': ['Unite', 'UniteWithCurrentDir', 'UniteWithBufferDir']}}
-NeoBundle 'itchyny/lightline.vim'
-"NeoBundle 'fweep/vim-zsh-path-completion'
-NeoBundle 'thinca/vim-template'
-NeoBundle 'scrooloose/syntastic'
-NeoBundleLazy 'LaTeX-Box-Team/LaTeX-Box', {'autoload' : {'filetypes' : ['tex']}}
-NeoBundle 'junegunn/vim-easy-align'
-NeoBundle 'tpope/vim-surround'
-"NeoBundle 'rhysd/vim-clang-format'
-NeoBundleLazy 'mattn/emmet-vim', {'autoload': {
-      \ 'filetypes': ['html', 'css', 'scss', 'eruby']}}
-"NeoBundleLazy 'sjl/gundo.vim', {'autoload': {'commands': ['GundoShow', 'GundoToggle']}}
-NeoBundle 'vim-jp/vimdoc-ja'
-NeoBundleLazy 'gregsexton/MatchTag', {'autoload': {'filetypes': ['html']}}
-NeoBundle 'plasticboy/vim-markdown'
-NeoBundle 'honza/dockerfile.vim'
-NeoBundleLazy 'tkztmk/vim-vala', {'autoload': {'filetypes': 'vala'}}
-NeoBundleLazy 'digitaltoad/vim-jade', {'autoload':{'filetypes':['jade']}}
-"NeoBundleLazy 'jiangmiao/simple-javascript-indenter', {'autoload': {'filetypes': 'javascript'}}
-"NeoBundle 'kchmck/vim-coffee-script'
-"NeoBundleLazy 'skammer/vim-css-color', {'autoload': {'filetypes': 'css'}}
-"NeoBundleLazy 'lilydjwg/colorizer', {'autoload': {'filetypes': 'css'}}
-NeoBundleLazy 'pangloss/vim-javascript', {'autoload': {'filetypes': 'javascript'}}
-NeoBundleLazy 'Shougo/neocomplete', {
-      \ 'depends':     ['Shougo/neosnippet', 'Shougo/context_filetype.vim'],
-      \ 'disabled':    !has('lua'),
-      \ 'vim_version': '7.3.885',
-      \ 'autoload':    {'insert' : 1,}
-      \ }
-" Colorscheme files {{{
-"NeoBundle 'tomasr/molokai'
-"NeoBundle 'jpo/vim-railscasts-theme'
-NeoBundle 'w0ng/vim-hybrid'
-"NeoBundle 'altercation/vim-colors-solarized'
-NeoBundle 'hukl/Smyck-Color-Scheme', {'script_type' : 'colors'}
-"}}}
-
-filetype plugin indent on     " Required!
-NeoBundleCheck " Installation check.
-
-""" }}}
-" colorscheme {{{
-" solarized
-"syntax enable
-"set background=dark
-"let g:solarized_termcolors=256
-"let g:solarized_termtrans=1
-"colorscheme solarized
 
 set t_Co=256
-"set background=dark
-""let g:hybrid_use_Xresources = 1
-"colorscheme hybrid
-
-"let g:molokai_original = 1
-"let g:rehash256 = 1
-"colorscheme molokai
-
-"Smyck
-colorscheme smyck
-"highlight Folded     ctermbg=0
-"highlight CursorLine ctermbg=0
-"highlight Visual     ctermbg=8 ctermfg=none
-"
-"highlight Normal ctermbg=none
+set background=dark
+colorscheme gruvbox
 " }}}
+" Plugins {{{
 " lightline {{{
 let g:lightline = {
       \ 'active': {
@@ -238,18 +178,16 @@ let g:easy_align_delimiters = {
       \ }
 " }}}
 " neocomplete {{{
-if neobundle#is_installed('neocomplete')
-  " neocomplete用設定
-  let g:neocomplete#enable_at_startup = 1
-  let g:neocomplete#enable_ignore_case = 1
-  let g:neocomplete#enable_smart_case = 1
-  if !exists('g:neocomplete#keyword_patterns')
+" neocomplete用設定
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_ignore_case = 1
+let g:neocomplete#enable_smart_case = 1
+if !exists('g:neocomplete#keyword_patterns')
   let g:neocomplete#keyword_patterns = {}
-    endif
-  let g:neocomplete#keyword_patterns._ = '\h\w*'
-  " <TAB>: completion.
-  inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 endif
+let g:neocomplete#keyword_patterns._ = '\h\w*'
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 "if has('lua')
 "  let s:bundle = neobundle#get('neocomplete')
 "  function! s:bundle.hooks.on_source(bundle)
@@ -330,72 +268,6 @@ endif
 "    let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 "  endfunction
 "" }}}
-" Unite {{{
-" Like ctrlp.vim settings.
-let g:unite_force_overwrite_statusline = 0
-call unite#custom#profile('default', 'context', {
-\   'start_insert': 1,
-\   'winheight': 10,
-\   'direction': 'botright',
-\   'prompt': '>>> ',
-\ })
-
-autocmd FileType unite call s:unite_my_settings()
-function! s:unite_my_settings() "{{{
-  " Overwrite settings.
-
-  imap <buffer> jj      <Plug>(unite_insert_leave)
-  "imap <buffer> <C-w>     <Plug>(unite_delete_backward_path)
-
-  imap <buffer><expr> j unite#smart_map('j', '')
-  imap <buffer> <TAB>   <Plug>(unite_select_next_line)
-  imap <buffer> <C-w>     <Plug>(unite_delete_backward_path)
-  imap <buffer> '     <Plug>(unite_quick_match_default_action)
-  nmap <buffer> '     <Plug>(unite_quick_match_default_action)
-  imap <buffer><expr> x
-          \ unite#smart_map('x', "\<Plug>(unite_quick_match_choose_action)")
-  nmap <buffer> x     <Plug>(unite_quick_match_choose_action)
-  nmap <buffer> <C-z>     <Plug>(unite_toggle_transpose_window)
-  imap <buffer> <C-z>     <Plug>(unite_toggle_transpose_window)
-  imap <buffer> <C-y>     <Plug>(unite_narrowing_path)
-  nmap <buffer> <C-y>     <Plug>(unite_narrowing_path)
-  nmap <buffer> <C-j>     <Plug>(unite_toggle_auto_preview)
-  nmap <buffer> <C-r>     <Plug>(unite_narrowing_input_history)
-  imap <buffer> <C-r>     <Plug>(unite_narrowing_input_history)
-  nnoremap <silent><buffer><expr> l
-          \ unite#smart_map('l', unite#do_action('default'))
-
-  let unite = unite#get_current_unite()
-  if unite.profile_name ==# 'search'
-    nnoremap <silent><buffer><expr> r     unite#do_action('replace')
-  else
-    nnoremap <silent><buffer><expr> r     unite#do_action('rename')
-  endif
-
-  nnoremap <silent><buffer><expr> cd     unite#do_action('lcd')
-  nnoremap <buffer><expr> S      unite#mappings#set_current_filters(
-          \ empty(unite#mappings#get_current_filters()) ?
-          \ ['sorter_reverse'] : [])
-
-  " Runs "split" action by <C-s>.
-  imap <silent><buffer><expr> <C-s>     unite#do_action('split')
-endfunction "}}}
-
-if executable('jvgrep')
-  " For jvgrep.
-  let g:unite_source_grep_command = 'jvgrep'
-  let g:unite_source_grep_default_opts = '-i --exclude ''\.(git|svn|hg|bzr)'''
-  let g:unite_source_grep_recursive_opt = '-R'
-endif
-
-" For ack.
-if executable('ack-grep')
-  " let g:unite_source_grep_command = 'ack-grep'
-  " let g:unite_source_grep_default_opts = '-i --no-heading --no-color -k -H'
-  " let g:unite_source_grep_recursive_opt = ''
-endif
-
-" }}}
 " CtrlP {{{
 let g:ctrlp_cmd = 'CtrlPBuffer'
 "if executable('ag')

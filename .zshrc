@@ -9,3 +9,4 @@ for config_file ($ZSH/lib/*.zsh); do
   source $config_file
 done
 
+export PATH=$PATH:`ruby -e 'puts Gem.user_dir'`/bin
