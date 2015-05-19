@@ -73,8 +73,10 @@
 ! Select the fonts to be used. This is a comma separated list of font
 ! URxvt*font: fontlist
 !URxvt*font: xft:Inconsolata:pixelsize=18
+!URxvt*font: xft:Inconsolata:pixelsize=11, \
+!            xft:Kochi Gothic
 URxvt*font: xft:Source Code Pro:pixelsize=11,\
-            xft:Source Han Sans JP
+            xft:TakaoExGothic
 ! URxvt*boldFont: fontlist
 ! URxvt*italicFont: fontlist
 ! The font list to use for displaying bold, italic or bold italic
@@ -233,7 +235,7 @@ URxvt*preeditType: OverTheSpot
 ! Compile frills: Associate string with keysym sym. The intervening
 ! URxvt*keysym.sym: string
 
-! URxvt*perl-ext-common: string
+URxvt*perl-ext-common: default,clipboard
 
 ! Comma-separated list(s) of perl extension scripts (default:
 ! URxvt*perl-ext: string
@@ -241,8 +243,11 @@ URxvt*preeditType: OverTheSpot
 ! Perl code to be evaluated when all extensions have been registered.
 ! URxvt*perl-eval: string
 
+URxvt.keysym.Shift-Control-C: perl:clipboard:copy
+URxvt.keysym.Shift-Control-V: perl:clipboard:paste
+
 ! Colon-separated list of additional directories that hold extension
-! URxvt*perl-lib: path
+URxvt*perl-lib: /usr/local/lib/urxvt/perl
 
 ! Additional selection patterns, see the urxvtperl(3) manpage for
 ! URxvt*selection.pattern-idx: perl-regex

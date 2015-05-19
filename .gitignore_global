@@ -1,4 +1,7 @@
 # Global gitignore
+.vagrant
+tags
+tags.lock
 *.sw*
 *~
 .DS_Store

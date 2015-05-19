@@ -1,4 +1,10 @@
-%w{xorg-server xorg-server-utils xorg-xinit mesa xf86-video-intel xf86-input-synaptics xclip rxvt-unicode urxvt-perls}.each do |pkg|
+case node['platform']
+when 'freebsd'
+  xorg_packages = %w{xorg xf86-input-synaptics xclip}
+else
+  xorg_packages = %w{xorg-server xorg-server-utils xorg-xinit mesa xf86-video-intel xf86-input-synaptics xclip}
+end
+xorg_packages.each do |pkg|
   package pkg do
     action :install
     user "root"
@@ -18,33 +24,7 @@ remote_file "/etc/X11/xorg.conf.d/50-synaptics.conf" do
   user "root"
 end
 
-
-# awesome
-package "awesome" do
-  action :install
-  user "root"
-end
-
-directory "#{ENV['HOME']}/.config" do
-  action :create
-end
-
-link "#{ENV['HOME']}/.config/awesome" do
-  action :create
-  to "#{ENV['HOME']}/dotfiles/config/awesome"
-end
-
-
-
-%w{fcitx-im fcitx-configtool fcitx-mozc}.each do |pkg|
-  package pkg do
-    action :install
-    user "root"
-  end
-end
-
-
-%w{ttf-dejavu ttf-liberation otf-ipafont adobe-source-code-pro-fonts adobe-source-han-sans-jp-fonts}.each do |pkg|
+%w{rxvt-unicode urxvt-perls}.each do |pkg|
   package pkg do
     action :install
     user "root"

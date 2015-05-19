@@ -2,9 +2,10 @@
 	name = tatarhy
 	email = tat.j.kikyo@gmail.com
 [alias]
-	lg = log --graph --decorate --oneline
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
 	co = checkout
+	st = status
 [core]
-	excludesfile = /Users/tat/.global_ignore
+	excludesfile = /home/tat/.gitignore_global
 [push]
 	default = simple

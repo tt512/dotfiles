@@ -1,7 +1,5 @@
-%w{zsh zsh-completions}.each do |pkg|
-  package pkg do
-    user "root"
-  end
+package "zsh" do
+  user "root"
 end
 
 %w{.zsh .zshrc}.each do |file|

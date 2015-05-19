@@ -1,4 +1,4 @@
-package 'gvim' do
+package 'vim' do
   action :install
   user "root"
 end

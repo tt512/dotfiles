@@ -11,25 +11,15 @@ if [ -d /etc/X11/xinit/xinitrc.d ]; then
   unset f
 fi
 
+[ -f ~/.xprofile ] && . ~/.xprofile
+
 #[[ -f ~/.Xresources ]] && xrdb -merge ~/.Xresources
 # From tagae/dotfiles
 for resource in ~/.Xresources ~/.Xresources.d/* ; do
   [ -r $resource ] && xrdb -merge $resource
 done
 
-#[[ -f ~/.Xmodmap ]] && xmodmap ~/.Xmodmap
-#xmodmap ~/.Xmodmap
-
-#setxkbmap -option ctrl:swapcaps
-#xmodmap -e "keycode 102 = Super_L"
-
-export GTK_IM_MODULE=fcitx
-export XMODIFIERS="@im=fcitx"
-export QT_IM_MODULE=fcitx
-fcitx
-
-skype &
-dropboxd &
+[ -f ~/.Xmodmap ] && xmodmap ~/.Xmodmap
 
 # exec gnome-session
 # exec startkde

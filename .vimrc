@@ -15,7 +15,7 @@ set fileencodings=utf-8,cp932,iso-2022-jp,euc-jp,default,latin
 set foldmethod=marker
 set clipboard=unnamedplus,unnamed,autoselect
 
-" コマンドライン補完
+" Commandline completion
 set wildmenu
 set wildmode=longest:full,full
 set wildignore=*.o
@@ -24,10 +24,16 @@ set ignorecase
 set smartcase
 
 " Default indent level
-set expandtab tabstop=2 shiftwidth=2
+set expandtab tabstop=4 shiftwidth=4 softtabstop=4
 
-" for D language
-au BufNewFile,BufRead *.d set expandtab tabstop=4 shiftwidth=4
+" Reset auto commands when reload
+augroup vimrc
+  autocmd!
+augroup END
+
+" Indent level for specific filetypes
+au vimrc FileType coffee,html,javascript,ruby,yaml setl et ts=2 sw=2 sts=2
+au vimrc FileType conf,xf86conf setl noet ts=8 sw=8 sts=8
 
 " Do not insert space when joining multibyte lines
 set formatoptions+=mM
@@ -61,6 +67,8 @@ call plug#begin('~/.vim/bundle')
 Plug 'kien/ctrlp.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'Shougo/neocomplete'
+Plug 'aperezdc/vim-template'
+Plug 'soramugi/auto-ctags.vim'
 "Plug 'thinca/vim-quickrun', {'autoload': {'on': 'Quickrun'}}
 "Plug 'beloglazov/vim-online-thesaurus'
 "Plug 'fweep/vim-zsh-path-completion'
@@ -71,9 +79,11 @@ Plug 'tpope/vim-surround'
 "Plug 'rhysd/vim-clang-format'
 Plug 'mattn/emmet-vim', { 'for': ['html', 'css', 'scss', 'eruby'] }
 "Plug 'sjl/gundo.vim', { 'on': ['GundoShow', 'GundoToggle'] }
-Plug 'vim-jp/vimdoc-ja'
+"Plug 'vim-jp/vimdoc-ja'
 Plug 'gregsexton/MatchTag', { 'for': 'html' }
 Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
+Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
+Plug 'evidens/vim-twig', { 'for': 'twig' }
 "Plug 'tomasr/molokai'
 "Plug 'w0ng/vim-hybrid'
 "Plug 'altercation/vim-colors-solarized'
@@ -96,11 +106,12 @@ set cursorline    " Highlight cursorline
 set display+=lastline
 
 " 80桁目をハイライト
-setlocal textwidth=0
-if exists('&colorcolumn')
-  setlocal colorcolumn=+1
-  autocmd FileType * setlocal textwidth=80
-endif
+set colorcolumn=80
+"setlocal textwidth=0
+"if exists('&colorcolumn')
+"  setlocal colorcolumn=+1
+"  autocmd FileType * setlocal textwidth=80
+"endif
 
 set t_Co=256
 set background=dark
@@ -274,6 +285,12 @@ let g:ctrlp_cmd = 'CtrlPBuffer'
 "  let g:ctrlp_use_caching = 0
 "  let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 "endif
+" }}}
+" vim-template {{{
+"let g:templates_directory = '~/.vim/template'
+" }}}
+" auto-ctags {{{
+"let g:auto_ctags_directory_list = ['.git']
 " }}}
 "" }}}
 " keymapping {{{
