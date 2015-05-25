@@ -1,11 +1,10 @@
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"         _
-"   _  __(_)_ _  ________
-" _| |/ / /  ' \/ __/ __/
-"(_)___/_/_/_/_/_/  \__/
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"          _
+"    _  __(_)_ _  ________
+"  _| |/ / /  ' \/ __/ __/
+" (_)___/_/_/_/_/_/  \__/    author: tatarhy
+"--------------------------------------------------
 
-" General {{{
+" General {{{1
 "set nocompatible
 ""カーソルを行頭、行末で止まらないようにする
 "set whichwrap=b,s,h,l,<,>,[,]
@@ -15,7 +14,7 @@ set fileencodings=utf-8,cp932,iso-2022-jp,euc-jp,default,latin
 set foldmethod=marker
 set clipboard=unnamedplus,unnamed,autoselect
 
-" Commandline completion
+" Command-line completion
 set wildmenu
 set wildmode=longest:full,full
 set wildignore=*.o
@@ -23,13 +22,13 @@ set wildignorecase
 set ignorecase
 set smartcase
 
-" Default indent level
-set expandtab tabstop=4 shiftwidth=4 softtabstop=4
-
 " Reset auto commands when reload
 augroup vimrc
   autocmd!
 augroup END
+
+" Default indent level
+set expandtab tabstop=4 shiftwidth=4 softtabstop=4
 
 " Indent level for specific filetypes
 au vimrc FileType coffee,html,javascript,ruby,yaml setl et ts=2 sw=2 sts=2
@@ -41,7 +40,7 @@ set formatoptions+=j " remove a comment leader
 set autoindent
 set smartindent
 
-set virtualedit=all " 文字がないところにも移動できる
+set virtualedit=all " cursor can be positioned anywhere
 set hidden          " switch buffer without saving
 
 "set magic " Special characters have special meaning without backslash
@@ -61,13 +60,20 @@ if !exists('loaded_matchit')
   runtime macros/matchit.vim
 endif
 
+" Install plug.vim if it is not installed yet
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall
+endif
+
 " }}}
-" Bundler {{{
+" Bundler {{{1
 call plug#begin('~/.vim/bundle')
 Plug 'kien/ctrlp.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'Shougo/neocomplete'
-Plug 'aperezdc/vim-template'
+Plug 'thinca/vim-template'
 Plug 'soramugi/auto-ctags.vim'
 "Plug 'thinca/vim-quickrun', {'autoload': {'on': 'Quickrun'}}
 "Plug 'beloglazov/vim-online-thesaurus'
@@ -84,6 +90,7 @@ Plug 'gregsexton/MatchTag', { 'for': 'html' }
 Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
 Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
 Plug 'evidens/vim-twig', { 'for': 'twig' }
+" -- Colorscheme --
 "Plug 'tomasr/molokai'
 "Plug 'w0ng/vim-hybrid'
 "Plug 'altercation/vim-colors-solarized'
@@ -91,7 +98,8 @@ Plug 'morhetz/gruvbox'
 Plug 'jpo/vim-railscasts-theme'
 call plug#end()
 """ }}}
-" Appearance {{{
+" Appearance {{{1
+set relativenumber
 syntax on
 set list " Tab、行末の半角スペースを明示的に表示する。
 set listchars=tab:>\ ,trail:~,extends:>,precedes:< " 不可視文字の表示形式
@@ -117,8 +125,8 @@ set t_Co=256
 set background=dark
 colorscheme gruvbox
 " }}}
-" Plugins {{{
-" lightline {{{
+" Plugins {{{1
+" lightline {{{2
 let g:lightline = {
       \ 'active': {
       \   'right': [ [ 'lineinfo' ],
@@ -133,18 +141,18 @@ let g:lightline = {
       \ }
       \ }
 " }}}
-" emmet-vim {{{
+" emmet-vim {{{2
 let g:user_emmet_settings = {'lang': 'ja'}
 " }}}
-" LaTeX-Box {{{
-let g:tex_flavor = 'latex'
-let g:LatexBox_output_type = 'pdf'
-let g:LatexBox_viewer = 'xdg-open'
-let g:LatexBox_latexmk_options = "-pdflatex='xelatex -synctex=1 \%O \%S'"
-let g:LatexBox_ignore_warnings
-      \ = ['Underfull', 'Overfull', 'specifier changed to', 'redefine-command']
+" LaTeX-Box {{{2
+"let g:tex_flavor = 'latex'
+"let g:LatexBox_output_type = 'pdf'
+"let g:LatexBox_viewer = 'xdg-open'
+"let g:LatexBox_latexmk_options = "-pdflatex='xelatex -synctex=1 \%O \%S'"
+"let g:LatexBox_ignore_warnings
+"      \ = ['Underfull', 'Overfull', 'specifier changed to', 'redefine-command']
 " }}}
-" syntastic {{{
+" syntastic {{{2
 let g:syntastic_mode_map = {
     \ 'mode': 'active',
     \ 'active_filetypes': ['c', 'c++', 'sass', 'ruby', 'vala', 'javascript'],
@@ -158,7 +166,7 @@ let g:syntastic_c_checkers=['gcc', 'cppcheck', 'splint']
 "let g:syntastic_cpp_checkers=["g++", 'cppcheck']
 let g:syntastic_vala_checkers = ['valac']
 " }}}
-" EasyAlign {{{
+" EasyAlign {{{2
 " For visual mode (e.g. vip<Enter>)
 vmap <Enter>   <Plug>(EasyAlign)
 
@@ -188,8 +196,7 @@ let g:easy_align_delimiters = {
       \   }
       \ }
 " }}}
-" neocomplete {{{
-" neocomplete用設定
+" neocomplete {{{2
 let g:neocomplete#enable_at_startup = 1
 let g:neocomplete#enable_ignore_case = 1
 let g:neocomplete#enable_smart_case = 1
@@ -199,140 +206,80 @@ endif
 let g:neocomplete#keyword_patterns._ = '\h\w*'
 " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-"if has('lua')
-"  let s:bundle = neobundle#get('neocomplete')
-"  function! s:bundle.hooks.on_source(bundle)
-"    let g:neocomplete#enable_at_startup = 1 " Use neocomplete.
-"    let g:neocomplete#enable_smart_case = 1 " Use smartcase.
-"    " Set minimum syntax keyword length.
-"    let g:neocomplete#sources#syntax#min_keyword_length = 3
-"    let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+
+"let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 "
-"    " Define dictionary.
-"    let g:neocomplete#sources#dictionary#dictionaries = {
-"          \ 'default' : '',
-"          \ 'vimshell' : $HOME.'/.vimshell_hist',
-"          \ 'scheme' : $HOME.'/.gosh_completions'
-"          \ }
+"" Define dictionary.
+"let g:neocomplete#sources#dictionary#dictionaries = {
+"      \ 'default' : '',
+"      \ 'vimshell' : $HOME.'/.vimshell_hist',
+"      \ 'scheme' : $HOME.'/.gosh_completions'
+"      \ }
 "
-"    " Define keyword.
-"    if !exists('g:neocomplete#keyword_patterns')
-"      let g:neocomplete#keyword_patterns = {}
-"    endif
-"    let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+"" Define keyword.
+"if !exists('g:neocomplete#keyword_patterns')
+"  let g:neocomplete#keyword_patterns = {}
+"endif
+"let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 "
-"    " Plugin key-mappings.
-"    inoremap <expr><C-g>     neocomplete#undo_completion()
-"    inoremap <expr><C-l>     neocomplete#complete_common_string()
+"" Plugin key-mappings.
+"inoremap <expr><C-g>     neocomplete#undo_completion()
+"inoremap <expr><C-l>     neocomplete#complete_common_string()
 "
-"    " Recommended key-mappings.
-"    " <CR>: close popup and save indent.
-"    inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-"    function! s:my_cr_function()
-"      return neocomplete#smart_close_popup() . "\<CR>"
-"      " For no inserting <CR> key.
-"      "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
-"    endfunction
-"    " <TAB>: completion.
-"    inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-"    " <C-h>, <BS>: close popup and delete backword char.
-"    inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-"    inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-"    inoremap <expr><C-y>  neocomplete#close_popup()
-"    inoremap <expr><C-e>  neocomplete#cancel_popup()
-"    " Close popup by <Space>.
-"    "inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
+"" Recommended key-mappings.
+"" <CR>: close popup and save indent.
+"inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+"function! s:my_cr_function()
+"  return neocomplete#smart_close_popup() . "\<CR>"
+"  " For no inserting <CR> key.
+"  "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+"endfunction
+"" <TAB>: completion.
+"inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+"" <C-h>, <BS>: close popup and delete backword char.
+"inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+"inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+"inoremap <expr><C-y>  neocomplete#close_popup()
+"inoremap <expr><C-e>  neocomplete#cancel_popup()
+"" Close popup by <Space>.
+""inoremap <expr><Space> pumvisible() ? neocomplete#close_popup() : "\<Space>"
 "
-"    " For cursor moving in insert mode(Not recommended)
-"    "inoremap <expr><Left>  neocomplete#close_popup() . "\<Left>"
-"    "inoremap <expr><Right> neocomplete#close_popup() . "\<Right>"
-"    "inoremap <expr><Up>    neocomplete#close_popup() . "\<Up>"
-"    "inoremap <expr><Down>  neocomplete#close_popup() . "\<Down>"
-"    " Or set this.
-"    "let g:neocomplete#enable_cursor_hold_i = 1
-"    " Or set this.
-"    "let g:neocomplete#enable_insert_char_pre = 1
+"" Enable omni completion.
+"autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+"autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+"autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+"autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+"autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 "
-"    " Shell like behavior(not recommended).
-"    "set completeopt+=longest
-"    "let g:neocomplete#enable_auto_select = 1
-"    "let g:neocomplete#disable_auto_complete = 1
-"    "inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
+"" Enable heavy omni completion.
+"if !exists('g:neocomplete#sources#omni#input_patterns')
+"  let g:neocomplete#sources#omni#input_patterns = {}
+"endif
+""let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
+""let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
+""let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 "
-"    " Enable omni completion.
-"    autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-"    autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-"    autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-"    autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-"    autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-"
-"    " Enable heavy omni completion.
-"    if !exists('g:neocomplete#sources#omni#input_patterns')
-"      let g:neocomplete#sources#omni#input_patterns = {}
-"    endif
-"    "let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-"    "let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-"    "let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-"
-"    " For perlomni.vim setting.
-"    " https://github.com/c9s/perlomni.vim
-"    let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-"  endfunction
 "" }}}
-" CtrlP {{{
+" CtrlP {{{2
 let g:ctrlp_cmd = 'CtrlPBuffer'
 "if executable('ag')
 "  let g:ctrlp_use_caching = 0
 "  let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 "endif
 " }}}
-" vim-template {{{
-"let g:templates_directory = '~/.vim/template'
+" vim-template {{{2
+autocmd User plugin-template-loaded
+            \ if search('<+CURSOR+>')
+            \ |  execute 'normal! "_da>'
+            \ | endif
 " }}}
-" auto-ctags {{{
+" auto-ctags {{{2
 "let g:auto_ctags_directory_list = ['.git']
 " }}}
 "" }}}
-" keymapping {{{
-
-" The prefix key.
-nnoremap    [unite]   <Nop>
-nmap    <Space> [unite]
-
-nnoremap <silent> [unite]c  :<C-u>UniteWithCurrentDir
-        \ -buffer-name=files buffer bookmark file<CR>
-nnoremap <silent> [unite]b  :<C-u>UniteWithBufferDir
-        \ -buffer-name=files -prompt=%\  buffer bookmark file<CR>
-nnoremap <silent> [unite]r  :<C-u>Unite
-        \ -buffer-name=register register<CR>
-nnoremap <silent> [unite]o  :<C-u>Unite outline<CR>
-nnoremap <silent> [unite]f
-        \ :<C-u>Unite -buffer-name=resume resume<CR>
-nnoremap <silent> [unite]ma
-        \ :<C-u>Unite mapping<CR>
-nnoremap <silent> [unite]me
-        \ :<C-u>Unite output:message<CR>
-nnoremap  [unite]f  :<C-u>Unite source<CR>
-
-nnoremap <silent> [unite]s
-        \ :<C-u>Unite -buffer-name=files -no-split
-        \ jump_point file_point buffer_tab
-        \ file_rec:! file file/new<CR>
-
+" keymapping {{{1
 " カーソルを表示行で移動
-nnoremap j gj
-nnoremap k gk
-
-" スペースでページ送り
-"nnoremap <Space> <PageDown>
-
-" emacs like keybinds in insert mode
-"inoremap <C-f> <Right>
-"inoremap <C-b> <Left>
-"inoremap <C-p> <Up>
-"inoremap <C-n> <Down>
-"inoremap <C-a> <Home>
-"inoremap <C-e> <End>
-
+"nnoremap j gj
+"nnoremap k gk
 "" }}}
 

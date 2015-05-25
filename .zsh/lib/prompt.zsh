@@ -1,77 +1,8 @@
-### Default shell configuration set prompt
-#local DEFAULT=$'%{^[[m%}'$
-#local GREEN=$'%{^[[1;31m%}'$
-
-#unsetopt prompt_subst
-#setopt extended_glob
-#PR_TIME="%@"
-#PR_PWD="%~"
-#PR_USER="%n@%m"
-#PR_MISCLEN=10
-#PR_PWD=${(%):-%~}
-#PR_LEFT="%F{magenta}[%@]%f  %F{yellow}[${PR_PWD}]%f "
-#PR_RIGHT=" %F{green}[%n@%m]%f"
-#PR_PWD=${(%)PR_PWD}
-#PR_LEFT=${(%)PR_LEFT}
-#PR_RIGHT=${(%)PR_RIGHT}
-
-#function theme_precmd {
-#  local TERMWIDTH
-#  (( TERMWIDTH = ${COLUMNS} - 1 ))
-#
-#  # Truncate the path if it's too long.
-#  PR_FILLBAR=""
-#  PR_PWDLEN=""
-#
-#  #local promptsize=${#${(%):---(%n@%m:%l)---()--}}
-#  #local promptsize=${#${(%):-[%@]  [%n@%m]}}
-#  #local pwdsize=${#${(%):- [%~] }}
-#  local pwdsize=${#${(%)PR_PWD}}
-#  promptsize=$(( ${#${(%)PR_TIME}} + ${#${(%)PR_USER}} + $PR_MISCLEN ))
-#
-#  if [[ "$promptsize + $pwdsize" -gt $TERMWIDTH ]]; then
-#    PR_PWDLEN=$(($TERMWIDTH - $promptsize))
-#    PR_PWD="%$PR_PWDLEN<...<%~%<<"
-#  else
-#    #PR_FILLBAR="\${(l.(($TERMWIDTH - ($promptsize + $pwdsize)))..${PR_HBAR}.)}"
-#    PR_FILLBAR="\${(l:(($TERMWIDTH - ($promptsize + $pwdsize)))::--:)}"
-#    PR_FILLBAR=${(e)PR_FILLBAR}
-#  fi
-#}
-#
-#setopt extended_glob
-#
-#setprompt () {
-#  # Need this so the prompt will work.
-  setopt prompt_subst
-#
-#  PR_HBAR="--"
-#
-#  local pwdstr="%$PR_PWDLEN<...<%~%<<"
-#  local user="%(!.%SROOT%s.%n)@%m"
-#  local hbar="${PR_FILLBAR}"
-#
-##PROMPT="%F{magenta}[%@]%f  %F{yellow}[${pwdstr}]%f ${PR_FILLBAR} %F{green}[${user}]%f
-PROMPT="%F{magenta}[%@]%f %F{yellow}[%~]%f %F{green}[%n@%m]%f
-%B%F{cyan}%#%f%b "
-#}
-#
-#setprompt
-#
-#autoload -U add-zsh-hook
-#add-zsh-hook precmd theme_precmd
-
-#PROMPT="%B%F{red}>%f%F{magenta}>%f%F{yellow}>%f%F{green}>%f%F{cyan}>%f%F{blue}>%f%F{black}>%f%F{white}>%f%b "
-##PROMPT="%{${fg[green]}%}%#%{${reset_color}%} "
-#local p_mark="%B%(!,#,>)%b"
-##PROMPT="%F{green}%#%f "
-#PROMPT="[%F{yellow}%~%f
-#%F{blue}%B%#%b%f "
-function box_name {
-    [ -f ~/.box-name ] && cat ~/.box-name || hostname -s
-}
-#PROMPT="%* [%F{cyan}%n@$(box_name)%f %F{black}|%f %F{yellow}%~%f  | %* ]
-#%F{yellow}%#%f "
+setopt prompt_subst
+#PROMPT="%F{magenta}[%@]%f %F{yellow}[%~]%f %F{green}[%n@%m]%f
+#%B%F{cyan}%#%f%b "
+NEWLINE=$'\n'
+PROMPT="%F{magenta}%T%f %F{yellow}%~%f${NEWLINE}%B%F{cyan}>>>%f%b "
 
 RPROMPT=""
 

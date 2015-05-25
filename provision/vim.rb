@@ -1,4 +1,4 @@
-package 'vim' do
+package 'gvim' do
   action :install
   user "root"
 end
@@ -8,5 +8,10 @@ end
     action :create
     to "#{ENV['HOME']}/dotfiles/#{file}"
   end
+end
+
+package 'ctags' do
+  action :install
+  user "root"
 end
 

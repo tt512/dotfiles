@@ -13,7 +13,7 @@
     helm
     auto-complete
     markdown-mode
-    simplenote
+    ddskk
     ))
 
 (let ((not-installed (loop for x in installing-package-list

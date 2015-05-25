@@ -13,6 +13,7 @@
 using namespace std;
 
 int main() {
-  return 0;
+    <+CURSOR+>
+    return 0;
 }
 

@@ -8,10 +8,10 @@
 ! Create the window with the specified X window geometry [default
 ! URxvt*geometry: geom
 
-! Use the specified colour as the window's background colour
+! Use the specified colour as the windows background colour
 ! URxvt*background: colour
 
-! Use the specified colour as the window's foreground colour
+! Use the specified colour as the windows foreground colour
 ! URxvt*foreground: colour
 
 ! Use the specified colour for the colour value n, where 0-7
@@ -76,7 +76,7 @@
 !URxvt*font: xft:Inconsolata:pixelsize=11, \
 !            xft:Kochi Gothic
 URxvt*font: xft:Source Code Pro:pixelsize=11,\
-            xft:TakaoExGothic
+            xft:Source Han Sans JP
 ! URxvt*boldFont: fontlist
 ! URxvt*italicFont: fontlist
 ! The font list to use for displaying bold, italic or bold italic
@@ -237,17 +237,20 @@ URxvt*preeditType: OverTheSpot
 
 URxvt*perl-ext-common: default,clipboard
 
+URxvt*keysym.M-C-c: perl:clipboard:copy
+URxvt*keysym.M-C-v: perl:clipboard:paste
+
 ! Comma-separated list(s) of perl extension scripts (default:
 ! URxvt*perl-ext: string
 
 ! Perl code to be evaluated when all extensions have been registered.
 ! URxvt*perl-eval: string
 
-URxvt.keysym.Shift-Control-C: perl:clipboard:copy
-URxvt.keysym.Shift-Control-V: perl:clipboard:paste
+!URxvt.keysym.Shift-Control-C: perl:clipboard:copy
+!URxvt.keysym.Shift-Control-V: perl:clipboard:paste
 
 ! Colon-separated list of additional directories that hold extension
-URxvt*perl-lib: /usr/local/lib/urxvt/perl
+!URxvt*perl-lib: /usr/lib/urxvt/perl
 
 ! Additional selection patterns, see the urxvtperl(3) manpage for
 ! URxvt*selection.pattern-idx: perl-regex
