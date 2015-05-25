@@ -21,6 +21,7 @@ alias g++='g++ -fdiagnostics-color=auto'
 if [[ "$OSTYPE" == "darwin"* ]]; then
   #alias vim='/Applications/MacVim.app/Contents/MacOS/Vim "$@"'
   #alias gvim='/Applications/MacVim.app/Contents/MacOS/mvim "$@"'
+  mvim () { command mvim --remote-silent "$@" || command mvim "$@"; }
 else
   gvim () { command gvim --remote-silent "$@" || command gvim "$@"; }
 fi
