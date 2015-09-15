@@ -1,13 +1,17 @@
-My dotfiles
-===========
+dotfiles
+========
+
+dotfiles for my development environment.
+
+- ArchLinux/Letsnote
+- OSX/Mac
 
 Installation
 ------------
 
+Use Itamae.
+
 ```
-sudo pacman -S ansible
-echo '127.0.0.1' > ~/ansible_hosts
-export ANSIBLE_HOSTS=~/ansible_hosts
-cd ~/dotfiles/install
-ansible-playbook archlinux-letsnote.yml -c local -K
+gem i itamae
+itamae local ~/dotfiles/provision/WHATEVER.rb
 ```
