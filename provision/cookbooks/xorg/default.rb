@@ -5,6 +5,7 @@
 #  xorg_packages = %w{xorg-server xorg-server-utils xorg-xinit mesa xf86-video-intel xf86-input-synaptics xclip}
 #end
 #xorg_packages.each do |pkg|
+
 %w{xorg-server xorg-server-utils xorg-xinit mesa xf86-video-intel xf86-input-synaptics xclip xorg-xev}.each do |pkg|
   package pkg do
     action :install
@@ -38,3 +39,12 @@ end
   end
 end
 
+# autologin to tty1
+remote_file "/etc/systemd/system/getty@tty1.service.d/override.conf" do
+  user "root"
+  owner "root"
+  group "root"
+  mode "0644"
+end
+
+remote_file File.expand_path("~/.zlogin")

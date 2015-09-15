@@ -75,8 +75,9 @@
 !URxvt*font: xft:Inconsolata:pixelsize=18
 !URxvt*font: xft:Inconsolata:pixelsize=11, \
 !            xft:Kochi Gothic
-URxvt*font: xft:Source Code Pro:pixelsize=11,\
-            xft:Source Han Sans JP
+URxvt*font: xft:MyricaM M:pixelsize=14
+!URxvt*font: xft:Source Code Pro:pixelsize=11,\
+!            xft:Source Han Sans JP
 ! URxvt*boldFont: fontlist
 ! URxvt*italicFont: fontlist
 ! The font list to use for displaying bold, italic or bold italic

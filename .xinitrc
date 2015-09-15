@@ -15,7 +15,7 @@ fi
 
 #[[ -f ~/.Xresources ]] && xrdb -merge ~/.Xresources
 # From tagae/dotfiles
-for resource in ~/.Xresources ~/.Xresources.d/* ; do
+for resource in ~/.Xresources ~/.Xresources.d/*.xresources ; do
   [ -r $resource ] && xrdb -merge $resource
 done
 
