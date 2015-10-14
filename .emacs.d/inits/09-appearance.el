@@ -14,10 +14,10 @@
 ;(set-frame-font "TakaoGothic-11")
 
 ;; Font setting
-(cond ((eq system-type 'linux)
+(cond ((eq system-type 'gnu/linux)
        (set-face-attribute 'default nil
                            :family "Source Code Pro"
-                           :height 110
+                           :height 100
                            :weight 'normal)
        (set-fontset-font nil 'japanese-jisx0208
                          (font-spec :family "Source Han Sans JP")))
