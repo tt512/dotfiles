@@ -1,28 +1,23 @@
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/"))
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
-(package-initialize)
+(when load-file-name
+  (setq user-emacs-directory (file-name-directory load-file-name)))
 
-;; install packages automatically
-(require 'cl)
-(defvar installing-package-list
-  '(
-    init-loader
-    helm
-    auto-complete
-    markdown-mode
-    ddskk
-    ))
+;; el-get lazy install
+(add-to-list 'load-path (locate-user-emacs-file "el-get/el-get"))
+(unless (require 'el-get nil 'noerror)
+  (with-current-buffer
+      (url-retrieve-synchronously
+       "https://raw.githubusercontent.com/dimitri/el-get/master/el-get-install.el")
+    (goto-char (point-max))
+    (eval-print-last-sexp)))
 
-(let ((not-installed (loop for x in installing-package-list
-                           when (not (package-installed-p x))
-                           collect x)))
-  (when not-installed
-    (package-refresh-contents)
-    (dolist (pkg not-installed)
-      (package-install pkg))))
+(el-get-bundle init-loader)
+(el-get-bundle helm)
+(el-get-bundle auto-complete)
+(el-get-bundle ddskk)
+(el-get-bundle open-junk-file)
+(el-get-bundle f)
+(el-get-bundle masaaki1001/helm-open-junk-files)
+(el-get-bundle adoc-mode)
 
 (require 'init-loader)
 (setq init-loader-show-log-after-init 'error-only)
