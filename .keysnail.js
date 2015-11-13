@@ -5,10 +5,30 @@
 // ========================================================================= //
 //{{%PRESERVE%
 // Put your codes here
+plugins.options["tanything_opt.keymap"] = {
+    "C-z"   : "prompt-toggle-edit-mode",
+    "SPC"   : "prompt-next-page",
+    "b"     : "prompt-previous-page",
+    "j"     : "prompt-next-completion",
+    "k"     : "prompt-previous-completion",
+    "g"     : "prompt-beginning-of-candidates",
+    "G"     : "prompt-end-of-candidates",
+    "D"     : "prompt-cancel",
+    // Tanything specific actions
+    "O"     : "localOpen",
+    "q"     : "localClose",
+    "p"     : "localLeftclose",
+    "n"     : "localRightclose",
+    "a"     : "localAllclose",
+    "d"     : "localDomainclose",
+    "c"     : "localClipUT",
+    "C"     : "localClipU",
+    "e"     : "localMovetoend"
+};
 //}}%PRESERVE%
 // ========================================================================= //
 
-// Special key settings {{{
+// ========================= Special key settings ========================== //
 
 key.quitKey              = "C-g";
 key.helpKey              = "<f1>";
@@ -20,8 +40,8 @@ key.universalArgumentKey = "C-u";
 key.negativeArgument1Key = "C--";
 key.negativeArgument2Key = "C-M--";
 key.negativeArgument3Key = "M--";
-// }}}
-//  Hooks {{{
+
+// ================================= Hooks ================================= //
 
 hook.addToHook('KeyBoardQuit', function (aEvent) {
          if (key.currentKeySequence.length)
@@ -56,7 +76,6 @@ hook.addToHook('KeyBoardQuit', function (aEvent) {
          }
      });
 
-// }}}
 // ============================= Key bindings ============================== //
 
 key.setGlobalKey('C-M-r', function (ev) {
@@ -75,13 +94,13 @@ key.setGlobalKey(["<f1>", "b"], function (ev) {
                 key.listKeyBindings();
             }, 'List all keybindings', false);
 
-key.setGlobalKey(["<f1>", "F"], function (ev) {
-                openHelpLink("firefox-help");
-            }, 'Display Firefox help', false);
-
 key.setGlobalKey('C-m', function (ev) {
                 key.generateKey(ev.originalTarget, KeyEvent.DOM_VK_RETURN, true);
             }, 'Generate the return key code', false);
+
+key.setGlobalKey(["<f1>", "F"], function (ev) {
+                openHelpLink("firefox-help");
+            }, 'Display Firefox help', false);
 
 key.setGlobalKey(["C-x", "l"], function (ev) {
                 command.focusToById("urlbar");
@@ -115,7 +134,7 @@ key.setGlobalKey(["C-x", "k"], function (ev) {
                 BrowserCloseTabOrWindow();
             }, 'Close tab / window', false);
 
-key.setViewKey('d', function (ev) {
+key.setViewKey("d", function (ev) {
                 BrowserCloseTabOrWindow();
             }, 'Close tab / window', false);
 
@@ -124,6 +143,10 @@ key.setGlobalKey(["C-x", "K"], function (ev) {
             }, 'Close the window', false);
 
 key.setGlobalKey(["C-c", "u"], function (ev) {
+                undoCloseTab();
+            }, 'Undo closed tab', false);
+
+key.setViewKey("u", function (ev) {
                 undoCloseTab();
             }, 'Undo closed tab', false);
 
@@ -277,8 +300,10 @@ key.setEditKey('C-M-y', function (ev) {
                 if (!command.kill.ring.length)
                     return;
 
-                let (ct = command.getClipboardText())
-                    (!command.kill.ring.length || ct != command.kill.ring[0]) && command.pushKillRing(ct);
+                let ct = command.getClipboardText();
+                if (!command.kill.ring.length || ct != command.kill.ring[0]) {
+                    command.pushKillRing(ct);
+                }
 
                 prompt.selector(
                     {
@@ -504,18 +529,27 @@ key.setCaretKey('M-n', function (ev) {
                 command.walkInputElement(command.elementsRetrieverButton, false, true);
             }, 'Focus to the previous button', false);
 
-// HoK {{{
+// HoK
 key.setViewKey('e', function (aEvent, aArg) {
-                ext.exec("hok-start-foreground-mode", aArg);
-            }, 'Hok - Foreground hint mode', true);
+    ext.exec("hok-start-foreground-mode", aArg);
+}, 'Hok - Foreground hint mode', true);
 
 key.setViewKey('E', function (aEvent, aArg) {
-                ext.exec("hok-start-background-mode", aArg);
-            }, 'HoK - Background hint mode', true);
+    ext.exec("hok-start-background-mode", aArg);
+}, 'HoK - Background hint mode', true);
 
 key.setViewKey(';', function (aEvent, aArg) {
-                ext.exec("hok-start-extended-mode", aArg);
-            }, 'HoK - Extented hint mode', true);
+    ext.exec("hok-start-extended-mode", aArg);
+}, 'HoK - Extented hint mode', true);
+
+key.setViewKey(['C-c', 'C-e'], function (aEvent, aArg) {
+    ext.exec("hok-start-continuous-mode", aArg);
+}, 'Start continuous HaH', true);
+
+key.setViewKey('c', function (aEvent, aArg) {
+    ext.exec("hok-yank-foreground-mode", aArg);
+}, 'Hok - Foreground yank hint mode', true);
+
 key.setViewKey([']', ']'], function (aEvent, aArg) {
                 ext.exec("hok-follow-next-link", aArg);
             }, 'Follow next link', true);
@@ -523,9 +557,9 @@ key.setViewKey([']', ']'], function (aEvent, aArg) {
 key.setViewKey(['[', '['], function (aEvent, aArg) {
                 ext.exec("hok-follow-prev-link", aArg);
             }, 'Follow previous link', true);
-// }}}
-// Tanything {{{
-key.setViewKey(["C-x", "b"], function (ev, arg) {
-                ext.exec("tanything", arg);
-            }, "view all tabs", true);
-// }}}
+
+// Tanything
+key.setViewKey(['C-x', 'b'], function (ev, arg) {
+                   ext.exec("tanything", arg);
+               }, "view all tabs", true);
+
