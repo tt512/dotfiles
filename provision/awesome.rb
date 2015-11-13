@@ -10,5 +10,6 @@ end
 
 link "#{ENV['HOME']}/.config/awesome" do
   action :create
-  to "#{ENV['HOME']}/dotfiles/config/awesome"
+  to "dotfiles/config/awesome"
+  cwd ENV['HOME']
 end

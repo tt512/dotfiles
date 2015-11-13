@@ -6,7 +6,8 @@ end
 %w{.vim .vimrc .gvimrc}.each do |file|
   link ENV['HOME'] do
     action :create
-    to "#{ENV['HOME']}/dotfiles/#{file}"
+    to "dotfiles/#{file}"
+    cwd ENV['HOME']
   end
 end
 

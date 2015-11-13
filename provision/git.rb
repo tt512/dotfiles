@@ -6,6 +6,7 @@ end
 %w{.gitconfig .gitignore_global}.each do |file|
   link ENV['HOME'] do
     action :create
-    to "#{ENV['HOME']}/dotfiles/#{file}"
+    to "dotfiles/#{file}"
+    cwd ENV['HOME']
   end
 end
