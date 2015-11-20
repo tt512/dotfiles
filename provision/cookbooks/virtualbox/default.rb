@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 #
-# virtualbox.rb
 # Copyright (C) 2015 tat <tat@s10>
 #
 # Distributed under terms of the MIT license.
@@ -14,8 +13,11 @@
   end
 end
 
-execute "add user to vboxusers group" do
-  command "gpasswd -a tat vboxusers"
+remote_file "/etc/modules-load.d/virtualbox.conf" do
+  user "root"
 end
 
-
+execute "load kernel modules" do
+  command "modprobe vboxdrv vboxnetadp vboxnetflt vboxpci"
+  user "root"
+end
