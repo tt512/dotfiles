@@ -4,3 +4,8 @@
     user "root"
   end
 end
+
+service "NetworkManager" do
+  action [:enable]
+  user "root"
+end
