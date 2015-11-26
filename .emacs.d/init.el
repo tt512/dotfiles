@@ -18,6 +18,7 @@
 (el-get-bundle f)
 (el-get-bundle masaaki1001/helm-open-junk-files)
 (el-get-bundle adoc-mode)
+(el-get-bundle markdown-mode)
 
 (require 'init-loader)
 (setq init-loader-show-log-after-init 'error-only)
