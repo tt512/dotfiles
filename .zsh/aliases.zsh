@@ -8,20 +8,30 @@ linux*)
   ;;
 esac
 #alias lsa='ls -lah'
-alias ll='ls -al'
+alias ll='ls -l'
+alias lla='ls -la'
 alias la='ls -AC'
 alias sl=ls # often screw this up
 
+setopt auto_pushd
+setopt pushd_ignore_dups
+setopt pushd_minus
+
+alias -g ...='../..'
+alias -g ....='../../..'
+alias -g .....='../../../..'
+alias -g ......='../../../../..'
+
 #alias grep="grep --color=always"
 
-#alias emacs 'emacsclient --alternate-editor="" -n'
+alias emacs='emacsclient --alternate-editor="" -n'
+alias p='pygmentize -O style=monokai -f console256'
 
-alias g++='g++ -fdiagnostics-color=auto'
+#alias g++='g++ -fdiagnostics-color=auto'
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  #alias vim='/Applications/MacVim.app/Contents/MacOS/Vim "$@"'
-  #alias gvim='/Applications/MacVim.app/Contents/MacOS/mvim "$@"'
   mvim () { command mvim --remote-silent "$@" || command mvim "$@"; }
+  alias gvim='mvim'
 else
   gvim () { command gvim --remote-silent "$@" || command gvim "$@"; }
 fi

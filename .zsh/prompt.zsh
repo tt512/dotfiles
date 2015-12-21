@@ -2,7 +2,7 @@ setopt prompt_subst
 #PROMPT="%F{magenta}[%@]%f %F{yellow}[%~]%f %F{green}[%n@%m]%f
 #%B%F{cyan}%#%f%b "
 NEWLINE=$'\n'
-PROMPT="%F{magenta}%T%f %F{yellow}%~%f${NEWLINE}%B%F{cyan}>>>%f%b "
+PROMPT="%F{magenta}%T%f %F{yellow}%~%f${NEWLINE}%B%F{cyan}%#%f%b "
 
 RPROMPT=""
 
