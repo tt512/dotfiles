@@ -75,7 +75,7 @@
 !URxvt*font: xft:Inconsolata:pixelsize=18
 !URxvt*font: xft:Inconsolata:pixelsize=11, \
 !            xft:Kochi Gothic
-URxvt*font: xft:MyricaM M:pixelsize=14
+URxvt*font: xft:Cica-12
 !URxvt*font: xft:Source Code Pro:pixelsize=11,\
 !            xft:Source Han Sans JP
 ! URxvt*boldFont: fontlist
@@ -83,7 +83,7 @@ URxvt*font: xft:MyricaM M:pixelsize=14
 ! The font list to use for displaying bold, italic or bold italic
 ! URxvt*boldItalicFont: fontlist
 ! Adjust font spacing
-URxvt*letterSpace: -1
+URxvt*letterSpace: 0
 
 ! When font styles are not enabled, or this option is enabled (True,
 ! URxvt*intensityStyles: boolean
@@ -157,6 +157,7 @@ URxvt*scrollBar: false
 
 ! Specifies number of lines (pixel height) to insert between each row
 ! URxvt*lineSpace: number
+URxvt*lineSpace: -1
 
 ! True: handle Meta (Alt) + keypress to set the 8th bit. False:
 ! URxvt*meta8: boolean
@@ -236,10 +237,13 @@ URxvt*preeditType: OverTheSpot
 ! Compile frills: Associate string with keysym sym. The intervening
 ! URxvt*keysym.sym: string
 
-URxvt*perl-ext-common: default,clipboard
+URxvt*perl-ext-common: default,matcher,resize-font
 
-URxvt*keysym.M-C-c: perl:clipboard:copy
-URxvt*keysym.M-C-v: perl:clipboard:paste
+URxvt.resize-font.smaller: C-Down
+URxvt.resize-font.bigger: C-Up
+
+!URxvt*keysym.M-C-c: perl:clipboard:copy
+!URxvt*keysym.M-C-v: perl:clipboard:paste
 
 ! Comma-separated list(s) of perl extension scripts (default:
 ! URxvt*perl-ext: string
