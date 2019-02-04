@@ -1,8 +1,0 @@
-polkit.addRule(function(action, subject) {
-    if (/^org\.opensuse\.cupspkhelper\.mechanism\./.test(action.id) &&
-        subject.isInGroup("wheel")) {
-            return polkit.Result.YES;
-    }
-});
-
-// vim: et ts=4 sw=4 sts=4 ft=javascript

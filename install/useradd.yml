@@ -1,8 +1,0 @@
----
-- hosts: archletsnote
-  user: root
-  tasks:
-    - pacman: name=zsh,zsh-completions
-    - user: name=tat shell=/bin/zsh group=users groups=wheel
-    - pacman: name=sudo
-    - lineinfile: dest=/etc/sudoers regexp='^# %wheel ALL=(ALL) ALL$' line='%wheel ALL=(ALL) ALL' validate='visudo -cf %s'
