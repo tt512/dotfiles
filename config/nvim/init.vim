@@ -83,7 +83,7 @@ set cursorline    " Highlight cursorline
 
 set colorcolumn=80
 
-set t_Co=256
+set termguicolors
 set background=dark
 colorscheme gruvbox
 " }}}
