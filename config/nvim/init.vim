@@ -31,8 +31,11 @@ augroup END
 " Default indent level
 set expandtab tabstop=4 shiftwidth=4 softtabstop=4
 
+let g:python_host_prog = '/usr/bin/python2'
+let g:python3_host_prog = '/usr/bin/python3'
+
 " Indent level for specific filetypes
-au vimrc FileType html,javascript,pascal,ruby,yaml,zsh,vim setl et ts=2 sw=2 sts=2
+au vimrc FileType html,javascript,typescript,pascal,ruby,yaml,zsh,vim,cucumber setl et ts=2 sw=2 sts=2
 au vimrc FileType conf,xf86conf setl noet ts=8 sw=8 sts=8
 
 " Install plug.vim if it is not installed yet
@@ -63,12 +66,14 @@ Plug 'Glench/Vim-Jinja2-Syntax'
 " HTML, JS, CSS
 Plug 'mattn/emmet-vim'
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
+Plug 'HerringtonDarkholme/yats.vim'
 Plug 'othree/yajs', { 'for': 'javascript' }
 Plug 'mxw/vim-jsx', { 'for': 'javascript' }
 Plug 'ap/vim-css-color', { 'for': ['css', 'scss', 'less', 'html'] }
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 " Other languages
 Plug 'vim-jp/vim-go-extra'
+Plug 'tpope/vim-cucumber'
 
 " -- Colorscheme --
 Plug 'morhetz/gruvbox'
