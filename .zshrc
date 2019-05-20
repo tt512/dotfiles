@@ -3,19 +3,17 @@
 # _|_ (_-< ' \| '_/ _|
 #(_)__/__/_||_|_| \__|
 #
-# Zplug {{{
-source ~/.zplug/init.zsh
-
-zplug 'zplug/zplug', hook-build:'zplug --self-manage'
-zplug "b4b4r07/enhancd", use:init.sh
-zplug 'zsh-users/zsh-history-substring-search'
-zplug 'zsh-users/zsh-completions'
-
-if ! zplug check; then
-    zplug install
+# Zplugin {{{
+if [[ ! -a $HOME/.zplugin ]]; then
+  git clone https://github.com/zdharma/zplugin.git $HOME/.zplugin
 fi
+source $HOME/.zplugin/bin/zplugin.zsh
+autoload -Uz _zplugin
+(( ${+_comps} )) && _comps[zplugin]=_zplugin
 
-zplug load
+zplugin light zsh-users/zsh-history-substring-search
+zplugin light zsh-users/zsh-completions
+zplugin light zsh-users/zsh-autosuggestions
 # }}}
 # Keybind {{{
 bindkey -e
@@ -54,23 +52,24 @@ function take() {
 }
 
 alias xclip='xclip -selection clipboard'
-
-function p () {
-  pygmentize -O style=monokai -f console256 $@ 2> /dev/null || cat $@
-}
 # }}}
 # Envvar {{{
 export PAGER="less"
 export LESS="-g -i -M -R -F -X"
-export EDITOR=vim
+export EDITOR=nvim
 export GOPATH=$HOME/go
+
+# deduplicate path values
+typeset -U PATH path
 PATH=$PATH:$HOME/bin
 PATH=$PATH:$GOPATH/bin
 export PATH=$PATH
-eval "$(direnv hook zsh)"
+
+if (( $+commands[direnv] )); then
+  eval "$(direnv hook zsh)"
+fi
 # }}}
 # Prompt {{{
-#setopt prompt_subst
 function _zsh_user_prompt() {
   local t="%F{magenta}%T%f"
   local dir="%F{yellow}%~%f"
@@ -84,7 +83,6 @@ setopt transient_rprompt
 
 autoload -Uz vcs_info
 autoload -Uz add-zsh-hook
-#autoload -Uz is-at-least
 autoload -Uz colors
 zstyle ':vcs_info:*' max-exports 3
 zstyle ':vcs_info:*' enable git
@@ -93,13 +91,6 @@ zstyle ':vcs_info:git:*' actionformats '[%F{cyan}%b%f%c%u]' '%m' '<!%a>'
 zstyle ':vcs_info:git:*' check-for-changes true
 zstyle ':vcs_info:git:*' stagedstr "%F{green}*%f"
 zstyle ':vcs_info:git:*' unstagedstr "%F{yellow}*%f"
-
-zstyle ':vcs_info:git+set-message:*' hooks \
-  git-hook-begin \
-  git-untracked \
-  git-push-status \
-  git-nomerge-branch \
-  git-stash-count
 
 function _update_vcs_info_msg() {
   local -a messages
@@ -118,21 +109,23 @@ function _update_vcs_info_msg() {
   RPROMPT="$prompt"
 }
 add-zsh-hook precmd _update_vcs_info_msg
-
-# VTE title
+# }}}
+# VTE title {{{
+# Write some info to terminal title.
+# This is seen when the shell prompts for input.
+function _vte_title_precmd {
+  print -Pn "\e]0;zsh%L %(1j,%j job%(2j|s|); ,)%~\a"
+}
+# Write command and args to terminal title.
+# This is seen while the shell waits for a command to complete.
+function _vte_title_preexec {
+  printf "\033]0;%s\a" "$1"
+}
 case $TERM in
   xterm*|*rxvt*)
-    # Write some info to terminal title.
-    # This is seen when the shell prompts for input.
-    function precmd {
-      print -Pn "\e]0;zsh%L %(1j,%j job%(2j|s|); ,)%~\a"
-    }
-    # Write command and args to terminal title.
-    # This is seen while the shell waits for a command to complete.
-    function preexec {
-      printf "\033]0;%s\a" "$1"
-    }
-  ;;
+    add-zsh-hook precmd  _vte_title_precmd
+    add-zsh-hook preexec _vte_title_preexec
+    ;;
 esac
 ## }}}
 # Completion {{{
@@ -149,4 +142,26 @@ zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#'
 zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
 zstyle ':completion:*' use-cache true
 zstyle ':completion::complete:*' cache-path $HOME/.cache/zsh
+
+autoload -Uz compinit; compinit
 # }}}
+
+# recompile if source is newer than .zwc
+# http://zsh.sourceforge.net/Doc/Release/User-Contributions.html#Recompiling-Functions
+autoload -Uz zrecompile
+zrecompile -q .zshrc
+zrecompile -q .zcompdump
+
+# Profiling
+#
+# * loading time
+#     time ( zsh -i -c exit )
+# * profile zshrc loading
+#     ZRCPROF=1 zsh -i -c exit
+# * profile prompt printing
+#     zmodload zsh/zprof; zplof | less
+#
+# See also .zshenv
+if [[ $ZRCPROF -eq 1 ]]; then
+  zprof | less
+fi
