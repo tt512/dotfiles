@@ -14,6 +14,9 @@ autoload -Uz _zplugin
 zplugin light zsh-users/zsh-history-substring-search
 zplugin light zsh-users/zsh-completions
 zplugin light zsh-users/zsh-autosuggestions
+
+zplugin ice pick"async.zsh" src"pure.zsh"
+zplugin light sindresorhus/pure
 # }}}
 # Keybind {{{
 bindkey -e
@@ -68,47 +71,6 @@ export PATH=$PATH
 if (( $+commands[direnv] )); then
   eval "$(direnv hook zsh)"
 fi
-# }}}
-# Prompt {{{
-function _zsh_user_prompt() {
-  local t="%F{magenta}%T%f"
-  local dir="%F{yellow}%~%f"
-  local ret="[%(?.%F{green}.%F{red})%?%f]"
-  local p="%B%F{cyan}%#%f%b"
-  echo "$t $dir $ret\n$p "
-}
-PROMPT=$(_zsh_user_prompt)
-
-setopt transient_rprompt
-
-autoload -Uz vcs_info
-autoload -Uz add-zsh-hook
-autoload -Uz colors
-zstyle ':vcs_info:*' max-exports 3
-zstyle ':vcs_info:*' enable git
-zstyle ':vcs_info:git:*' formats '[%F{cyan}%b%f%c%u]' '%m'
-zstyle ':vcs_info:git:*' actionformats '[%F{cyan}%b%f%c%u]' '%m' '<!%a>'
-zstyle ':vcs_info:git:*' check-for-changes true
-zstyle ':vcs_info:git:*' stagedstr "%F{green}*%f"
-zstyle ':vcs_info:git:*' unstagedstr "%F{yellow}*%f"
-
-function _update_vcs_info_msg() {
-  local -a messages
-  local prompt
-  LANG=en_US.UTF-8 vcs_info
-  # Print nothing if get no vcs_info
-  if [[ -z ${vcs_info_msg_0_} ]]; then
-    prompt=""
-  else
-    [[ -n "$vcs_info_msg_0_" ]] && messages+=( "${vcs_info_msg_0_}" )
-    [[ -n "$vcs_info_msg_1_" ]] && messages+=( "%F{yellow}${vcs_info_msg_1_}%f" )
-    [[ -n "$vcs_info_msg_2_" ]] && messages+=( "%F{red}${vcs_info_msg_2_}%f" )
-    # join with space
-    prompt="${(j: :)messages}"
-  fi
-  RPROMPT="$prompt"
-}
-add-zsh-hook precmd _update_vcs_info_msg
 # }}}
 # VTE title {{{
 # Write some info to terminal title.
