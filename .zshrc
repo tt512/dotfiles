@@ -4,8 +4,8 @@
 #(_)__/__/_||_|_| \__|
 #
 # Zplugin {{{
-if [[ ! -a $HOME/.zplugin ]]; then
-  git clone https://github.com/zdharma/zplugin.git $HOME/.zplugin
+if [[ ! -a $HOME/.zplugin/bin ]]; then
+  git clone https://github.com/zdharma/zplugin.git $HOME/.zplugin/bin
 fi
 source $HOME/.zplugin/bin/zplugin.zsh
 autoload -Uz _zplugin

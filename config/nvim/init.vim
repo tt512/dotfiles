@@ -37,6 +37,7 @@ let g:python3_host_prog = '/usr/bin/python3'
 " Indent level for specific filetypes
 au vimrc FileType html,javascript,typescript,pascal,ruby,yaml,zsh,vim,cucumber setl et ts=2 sw=2 sts=2
 au vimrc FileType conf,xf86conf setl noet ts=8 sw=8 sts=8
+au vimrc FileType go setl noet ts=4 sw=4 sts=4
 
 " Install plug.vim if it is not installed yet
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
@@ -58,6 +59,8 @@ Plug 'Chiel92/vim-autoformat'
 Plug 'majutsushi/tagbar'
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'airblade/vim-gitgutter'
+Plug 'tyru/eskk.vim'
+Plug 'jxnblk/vim-mdx-js'
 " Completion
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugin' }
 Plug 'zchee/deoplete-jedi'
@@ -71,6 +74,8 @@ Plug 'othree/yajs', { 'for': 'javascript' }
 Plug 'mxw/vim-jsx', { 'for': 'javascript' }
 Plug 'ap/vim-css-color', { 'for': ['css', 'scss', 'less', 'html'] }
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+Plug 'HerringtonDarkholme/yats.vim'
+Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
 " Other languages
 Plug 'vim-jp/vim-go-extra'
 Plug 'tpope/vim-cucumber'
@@ -148,17 +153,19 @@ let g:ctrlp_extensions = ['buffertag']
 " }}}
 " ALE {{{2
 let g:ale_fixers = {
-      \   'python': [
-      \     'autopep8',
-      \   ],
-      \   'javascript': [
-      \     'eslint',
-      \   ],
+      \   'python': ['autopep8'],
+      \   'javascript': ['eslint'],
+      \   'typescript': ['eslint'],
+      \   'c': ['clang-format'],
+      \   'go': ['gofmt'],
       \ }
 let g:ale_fix_on_save = 1
 " }}}
 " deoplete {{{2
 let g:deoplete#enable_at_startup = 1
+" }}}
+" eskk {{{2
+let g:eskk#large_dictionary = '~/SKK-JISYO.XL'
 " }}}
 " }}}
 " keymapping {{{1
