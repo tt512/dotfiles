@@ -1,0 +1,22 @@
+{
+  "coc.preferences.formatOnSaveFiletypes": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "typescript.tsx"
+  ],
+  "diagnostic.warningSign": ">>",
+  "eslint.filetypes": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "typescript.tsx"
+  ],
+  "git.addedSign.hlGroup": "GitGutterAdd",
+  "git.changedSign.hlGroup": "GitGutterChange",
+  "git.removedSign.hlGroup": "GitGutterDelete",
+  "git.topRemovedSign.hlGroup": "GitGutterDelete",
+  "git.changeRemovedSign.hlGroup": "GitGutterChangeDelete"
+}
