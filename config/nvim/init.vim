@@ -18,6 +18,8 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-surround'
 Plug 'junegunn/vim-easy-align'
 Plug 'scrooloose/nerdtree'
+Plug 'liuchengxu/vista.vim'
+Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-startify'
 Plug 'tyru/eskk.vim'
 Plug 'ludovicchabant/vim-gutentags'
@@ -45,6 +47,7 @@ set hidden          " switch buffer without saving
 set cmdheight=2
 set updatetime=300
 set shortmess+=c
+set signcolumn=yes
 
 " Some langservers have issues with backup files
 " see https://github.com/neoclide/coc.nvim/issues/649
@@ -92,9 +95,10 @@ let g:python3_host_prog = '/usr/bin/python3'
 " Plugins Settings {{{1
 " vim-plug {{{2
 let g:plug_window = 'tab new'
+command! PU PlugUpdate | PlugUpgrade
 " }}}
 " vim-airline {{{2
-let g:airline_theme='gruvbox'
+let g:airline_symbols_ascii = 1
 let g:airline_mode_map = {
       \ '__'     : '-',
       \ 'c'      : 'C',
@@ -206,6 +210,12 @@ endfunction
 " eskk {{{2
 let g:eskk#large_dictionary = '~/SKK-JISYO.XL'
 " }}}
+" Startify {{{2
+let g:startify_change_to_dir = 0
+" }}}
+" Vista.vim {{{2
+let g:vista#renderer#enable_icon = 0
+" }}}
 " }}}
 " Key Mappings {{{1
 " EasyAlign
@@ -263,10 +273,11 @@ nnoremap <silent> <space>d  :<C-u>CocList diagnostics<cr>
 nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
 nnoremap <silent> <space>f  :<C-u>CocList files<cr>
 nnoremap <silent> <space>g  :<C-u>CocList --normal gstatus<cr>
-nnoremap <silent> <space>l  :<C-u>CocList lists<cr>
+nnoremap <silent> <space>l  :<C-u>CocList lines<cr>
+nnoremap <silent> <space>L  :<C-u>CocList lists<cr>
 nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
 nnoremap <silent> <space>h  :<C-u>CocList helptags<cr>
-nnoremap <silent> <space>r  :<C-u>CocList mru<cr>
+nnoremap <silent> <space>r  :<C-u>CocList -A mru<cr>
 nnoremap <silent> <space>m  :<C-u>CocList marks<cr>
 nnoremap <silent> <space>M  :<C-u>CocList maps<cr>
 nnoremap <silent> <space>s  :<C-u>CocList searchhistory<cr>
@@ -279,6 +290,8 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 nnoremap <silent> <space>t  :<C-u>NERDTree<CR>
 nnoremap <silent> <space>T  :<C-u>NERDTreeClose<CR>
+
+nnoremap <silent> <space>R :<C-u>so $MYVIMRC<cr>:echo 'vimrc reloaded'<cr>
 
 " Do default action for next item.
 nnoremap <silent> <space>j  :<C-u>CocNext<CR>
