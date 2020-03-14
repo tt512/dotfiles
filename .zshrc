@@ -3,20 +3,20 @@
 # _|_ (_-< ' \| '_/ _|
 #(_)__/__/_||_|_| \__|
 #
-# Zplugin {{{
-if [[ ! -a $HOME/.zplugin/bin ]]; then
-  git clone https://github.com/zdharma/zplugin.git $HOME/.zplugin/bin
+# Zinit {{{
+if [[ ! -a $HOME/.zinit/bin ]]; then
+  git clone https://github.com/zdharma/zinit.git $HOME/.zinit/bin
 fi
-source $HOME/.zplugin/bin/zplugin.zsh
-autoload -Uz _zplugin
-(( ${+_comps} )) && _comps[zplugin]=_zplugin
+source $HOME/.zinit/bin/zinit.zsh
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
 
-zplugin light zsh-users/zsh-history-substring-search
-zplugin light zsh-users/zsh-completions
-zplugin light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-history-substring-search
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
 
-zplugin ice pick"async.zsh" src"pure.zsh"
-zplugin light sindresorhus/pure
+zinit ice pick"async.zsh" src"pure.zsh"
+zinit light sindresorhus/pure
 # }}}
 # Keybind {{{
 bindkey -e
