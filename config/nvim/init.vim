@@ -4,21 +4,31 @@
 " (_)___/_/_/_/_/_/  \__/
 "--------------------------------------------------
 
-" Plugin Management {{{1
+" Initial Settings {{{1
+scriptencoding utf8
+
+" Reset autocommands when reload
+augroup vimrc
+  autocmd!
+augroup END
+
 " Install plug.vim if it is not installed yet
 if empty(glob('~/.local/share/nvim/site/autoload/plug.vim'))
   silent !curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs
         \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall
+  autocmd vimrc VimEnter * PlugInstall
 endif
+" }}}
+" Plugin Management {{{1
 call plug#begin('~/.local/share/nvim/plugged')
 Plug 'junegunn/vim-plug'
 Plug 'vim-airline/vim-airline'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tpope/vim-surround'
 Plug 'junegunn/vim-easy-align'
-Plug 'scrooloose/nerdtree'
-Plug 'liuchengxu/vista.vim'
+Plug 'Shougo/defx.nvim', {'do': ':UpdateRemotePlugins'}
+Plug 'kristijanhusak/defx-git'
+Plug 'majutsushi/tagbar'
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-startify'
 Plug 'tyru/eskk.vim'
@@ -75,11 +85,6 @@ set colorcolumn=80
 set termguicolors
 set background=dark
 colorscheme gruvbox
-
-" Reset auto commands when reload
-augroup vimrc
-  autocmd!
-augroup END
 
 " Default indent level
 set expandtab tabstop=4 shiftwidth=4 softtabstop=4
@@ -158,15 +163,12 @@ let g:coc_global_extensions = [
       \ 'coc-python']
 
 " Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
+autocmd vimrc CursorHold * silent call CocActionAsync('highlight')
 
-augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
+" Setup formatexpr specified filetype(s).
+autocmd vimrc FileType typescript,json setl formatexpr=CocAction('formatSelected')
+" Update signature help on jump placeholder
+autocmd vimrc User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
@@ -213,8 +215,55 @@ let g:eskk#large_dictionary = '~/SKK-JISYO.XL'
 " Startify {{{2
 let g:startify_change_to_dir = 0
 " }}}
-" Vista.vim {{{2
-let g:vista#renderer#enable_icon = 0
+" Defx {{{2
+call defx#custom#option('_', {
+      \ 'root_marker': ':',
+      \ 'split': 'vertical',
+      \ 'direction': 'topleft',
+      \ 'winwidth': 30,
+      \ 'columns': 'indent:icon:filename:git',
+      \ })
+call defx#custom#column('filename', {
+      \ 'root_marker_highlight': 'Ignore',
+      \ 'min_width': 30,
+      \ 'max_width': 30,
+      \ })
+call defx#custom#column('icon', {
+      \ 'directory_icon': '▶',
+      \ 'opened_icon': '▼',
+      \ 'root_icon': '-',
+      \ })
+call defx#custom#column('git', 'indicators', {
+      \ 'Modified'  : 'M',
+      \ 'Staged'    : 'S',
+      \ 'Untracked' : 'U',
+      \ 'Renamed'   : 'R',
+      \ 'Unmerged'  : '═',
+      \ 'Ignored'   : 'I',
+      \ 'Deleted'   : 'D',
+      \ 'Unknown'   : '?'
+      \ })
+autocmd vimrc FileType defx call s:defx_my_settings()
+function! s:defx_my_settings() abort
+  " Define mappings
+  nnoremap <silent><buffer><expr> <CR>
+              \ defx#is_directory() ?
+              \ defx#do_action('open_or_close_tree') :
+              \ defx#do_action('drop')
+  nnoremap <silent><buffer><expr> l defx#do_action('open_tree')
+  nnoremap <silent><buffer><expr> h defx#do_action('close_tree')
+  nnoremap <silent><buffer><expr> c defx#do_action('copy')
+  nnoremap <silent><buffer><expr> m defx#do_action('move')
+  nnoremap <silent><buffer><expr> p defx#do_action('paste')
+  nnoremap <silent><buffer><expr> r defx#do_action('rename')
+  nnoremap <silent><buffer><expr> d defx#do_action('remove')
+  nnoremap <silent><buffer><expr> K defx#do_action('new_directory')
+  nnoremap <silent><buffer><expr> N defx#do_action('new_file')
+  nnoremap <silent><buffer><expr> M defx#do_action('new_multiple_files')
+  nnoremap <silent><buffer><expr> I defx#do_action('toggle_ignored_files')
+  nnoremap <silent><buffer><expr> q defx#do_action('quit')
+  nnoremap <silent><buffer><expr> cd defx#do_action('change_vim_cwd')
+endfunction
 " }}}
 " }}}
 " Key Mappings {{{1
@@ -288,10 +337,13 @@ nnoremap <silent> <space>w  :<C-u>CocList windows<cr>
 nnoremap <silent> <space>q  :<C-u>CocList quickfix<cr>
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
-nnoremap <silent> <space>t  :<C-u>NERDTree<CR>
-nnoremap <silent> <space>T  :<C-u>NERDTreeClose<CR>
+nnoremap <silent> <space>t  :<C-u>Defx<CR>
+nnoremap <silent> <space>T  :<C-u>Defx -toggle<CR>
+nnoremap <silent> <space>m  :<C-u>TagbarOpen<CR>
+nnoremap <silent> <space>M  :<C-u>TagbarClose<CR>
 
 nnoremap <silent> <space>R :<C-u>so $MYVIMRC<cr>:echo 'vimrc reloaded'<cr>
+nnoremap <silent> <space>E :<C-u>e $MYVIMRC<cr>
 
 " Do default action for next item.
 nnoremap <silent> <space>j  :<C-u>CocNext<CR>
