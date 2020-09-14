@@ -15,6 +15,11 @@ zinit light zsh-users/zsh-history-substring-search
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 
+zinit ice from"gh-r" as"program" mv"direnv* -> direnv" \
+    atclone'./direnv hook zsh > zhook.zsh' atpull'%atclone' \
+    pick"direnv" src"zhook.zsh"
+zinit light direnv/direnv
+
 zinit ice pick"async.zsh" src"pure.zsh"
 zinit light sindresorhus/pure
 # }}}
@@ -60,17 +65,13 @@ alias xclip='xclip -selection clipboard'
 export PAGER="less"
 export LESS="-g -i -M -R -F -X"
 export EDITOR=nvim
-export GOPATH=$HOME/go
+
+export GOROOT="$HOME/.go"
+export GOPATH="$HOME/go"
 
 # deduplicate path values
 typeset -U PATH path
-PATH=$PATH:$HOME/bin
-PATH=$PATH:$GOPATH/bin
-export PATH=$PATH
-
-if (( $+commands[direnv] )); then
-  eval "$(direnv hook zsh)"
-fi
+export PATH="$HOME/bin:$GOPATH/bin:$PATH"
 # }}}
 # VTE title {{{
 # Write some info to terminal title.
