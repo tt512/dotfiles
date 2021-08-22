@@ -15,6 +15,8 @@ require'packer'.startup({
     use 'neovim/nvim-lspconfig'
     use 'kabouzeid/nvim-lspinstall'
     use {'glepnir/lspsaga.nvim', config = function() require'lspsaga'.init_lsp_saga() end}
+    use "folke/lua-dev.nvim"
+    use "rafcamlet/nvim-luapad"
 
     use 'hrsh7th/nvim-compe'
 
@@ -24,7 +26,7 @@ require'packer'.startup({
     use 'hoob3rt/lualine.nvim'
     use {'akinsho/nvim-toggleterm.lua', config = function() require'toggleterm'.setup() end}
 
-    use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
+    use {'nvim-treesitter/nvim-treesitter', branch = '0.5-compat', run = ':TSUpdate'}
 
     use {'lukas-reineke/indent-blankline.nvim'}
     use 'lukas-reineke/format.nvim'
@@ -103,7 +105,9 @@ local function setup_servers()
     end
 
     local config = {on_attach = on_attach}
-    if server == "lua" then config.settings = {Lua = {diagnostics = {globals = {'vim'}}}} end
+    if server == "lua" then
+      config = require("lua-dev").setup({lspconfig = {globals = {'vim'}, on_attach = on_attach}})
+    end
     require'lspconfig'[server].setup(config)
   end
 end
@@ -249,12 +253,13 @@ require'gitlinker'.setup {
 local nerdtree = require('lualine.extensions.nerdtree')
 local lualine_fern = {sections = vim.deepcopy(nerdtree.sections), filetypes = {'fern'}}
 local lualine_vista = {sections = {lualine_a = {function() return vim.g.vista.provider end}}, filetypes = {'vista'}}
+local nearest_function = function() return vim.b.vista_nearest_method_or_function end
 require'lualine'.setup {
   options = {theme = 'tokyonight', section_separators = '', component_separators = '│', icons_enabled = false},
   sections = {
     lualine_a = {'mode'},
     lualine_b = {'branch'},
-    lualine_c = {'filename'},
+    lualine_c = {'filename', nearest_function},
     lualine_x = {'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
     lualine_z = {'location'}
