@@ -13,12 +13,12 @@ require'packer'.startup({
     use 'wbthomason/packer.nvim'
 
     use 'neovim/nvim-lspconfig'
-    use 'kabouzeid/nvim-lspinstall'
+    use 'williamboman/nvim-lsp-installer'
     use {'glepnir/lspsaga.nvim', config = function() require'lspsaga'.init_lsp_saga() end}
     use "folke/lua-dev.nvim"
     use "rafcamlet/nvim-luapad"
 
-    use 'hrsh7th/nvim-compe'
+    use {'hrsh7th/nvim-cmp', requires = {'hrsh7th/cmp-nvim-lsp', 'hrsh7th/cmp-buffer'}}
 
     use {'nvim-telescope/telescope.nvim', requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}}
     use {'lambdalisue/fern.vim', 'lambdalisue/fern-git-status.vim'}
@@ -28,7 +28,9 @@ require'packer'.startup({
 
     use {'nvim-treesitter/nvim-treesitter', branch = '0.5-compat', run = ':TSUpdate'}
 
+    use 'famiu/bufdelete.nvim'
     use {'lukas-reineke/indent-blankline.nvim'}
+    use 'tpope/vim-sleuth'
     use 'lukas-reineke/format.nvim'
     use 'kyazdani42/nvim-web-devicons'
     use 'ojroques/vim-oscyank'
@@ -96,77 +98,66 @@ augroup END
 vim.cmd [[colorscheme tokyonight]]
 -- }}}1
 -- LSP {{{1
-local function setup_servers()
-  require'lspinstall'.setup()
-  local servers = require'lspinstall'.installed_servers()
-  for _, server in pairs(servers) do
-    local on_attach = function(client, bufnr)
-      vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', {noremap = true, silent = true})
-    end
+local lsp_installer = require("nvim-lsp-installer")
 
-    local config = {on_attach = on_attach}
-    if server == "lua" then
-      config = require("lua-dev").setup({lspconfig = {globals = {'vim'}, on_attach = on_attach}})
-    end
-    require'lspconfig'[server].setup(config)
+lsp_installer.on_server_ready(function(server)
+  local on_attach = function(client, bufnr)
+    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', {noremap = true, silent = true})
   end
-end
-setup_servers()
--- Automatically reload after `:LspInstall <server>` so we don't have to restart neovim
-require'lspinstall'.post_install_hook = function()
-  setup_servers() -- reload installed servers
-  vim.cmd("bufdo e") -- this triggers the FileType autocmd that starts the server
-end
+
+  local opts = {}
+
+  -- (optional) Customize the options passed to the server
+  -- if server.name == "tsserver" then
+  --     opts.root_dir = function() ... end
+  -- end
+
+  require'lspconfig'[server.name].setup {
+    on_attach = on_attach,
+    capabilities = require'cmp_nvim_lsp'.update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  }
+  -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
+  server:setup(opts)
+  vim.cmd [[ do User LspAttachBuffers ]]
+end)
 -- }}}1
 -- Completion {{{1
 vim.opt.completeopt = {'menuone', 'noselect'}
+local cmp = require 'cmp'
 
-require'compe'.setup {source = {path = true, buffer = true, calc = true, nvim_lsp = true, nvim_lua = true}}
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      -- For `vsnip` user.
+      vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` user.
 
-local t = function(str) return vim.api.nvim_replace_termcodes(str, true, true, true) end
+      -- For `luasnip` user.
+      -- require('luasnip').lsp_expand(args.body)
 
-local check_back_space = function()
-  local col = vim.fn.col('.') - 1
-  return col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') ~= nil
-end
-
--- Use (s-)tab to:
---- move to prev/next item in completion menuone
---- jump to prev/next snippet's placeholder
-_G.tab_complete = function()
-  if vim.fn.pumvisible() == 1 then
-    return t "<C-n>"
-  elseif vim.fn['vsnip#available'](1) == 1 then
-    return t "<Plug>(vsnip-expand-or-jump)"
-  elseif check_back_space() then
-    return t "<Tab>"
-  else
-    return vim.fn['compe#complete']()
-  end
-end
-_G.s_tab_complete = function()
-  if vim.fn.pumvisible() == 1 then
-    return t "<C-p>"
-  elseif vim.fn['vsnip#jumpable'](-1) == 1 then
-    return t "<Plug>(vsnip-jump-prev)"
-  else
-    -- If <S-Tab> is not working in your terminal, change it to <C-h>
-    return t "<S-Tab>"
-  end
-end
-
-vim.api.nvim_set_keymap("i", "<CR>", [[compe#confirm(luaeval("require 'nvim-autopairs'.autopairs_cr()"))]],
-                        {expr = true})
-vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
-
-require'nvim-autopairs'.setup {}
-require("nvim-autopairs.completion.compe").setup({
+      -- For `ultisnips` user.
+      -- vim.fn["UltiSnips#Anon"](args.body)
+    end
+  },
+  mapping = {
+    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.close(),
+    ['<CR>'] = cmp.mapping.confirm({select = true})
+  },
+  sources = {{name = 'nvim_lsp'}, {name = 'buffer'}}
+})
+require('nvim-autopairs').setup {}
+-- you need setup cmp first put this after cmp.setup()
+require("nvim-autopairs.completion.cmp").setup({
   map_cr = true, --  map <CR> on insert mode
-  map_complete = true, -- it will auto insert `(` after select function or method item
-  auto_select = false -- auto select first item
+  map_complete = true, -- it will auto insert `(` (map_char) after select function or method item
+  auto_select = true, -- automatically select the first item
+  insert = false, -- use insert confirm behavior instead of replace
+  map_char = { -- modifies the function or method delimiter by filetypes
+    all = '(',
+    tex = '{'
+  }
 })
 -- }}}1
 -- Debugging {{{1
@@ -186,9 +177,9 @@ vim.api.nvim_set_keymap('n', '<leader>dr', [[<cmd>lua require'dap'.repl.open()<C
 vim.api.nvim_set_keymap('n', '<leader>dl', [[<cmd>lua require'dap'.run_last()<CR>]], {noremap = true, silent = true})
 
 local dap_install = require("dap-install")
-local dbg_list = require("dap-install.debuggers_list").debuggers
+local dbg_list = require("dap-install.api.debuggers").get_installed_debuggers()
 
-for debugger, _ in pairs(dbg_list) do dap_install.config(debugger, {}) end
+for _, debugger in ipairs(dbg_list) do dap_install.config(debugger) end
 
 require'dapui'.setup()
 
@@ -331,6 +322,7 @@ vim.api.nvim_set_keymap('n', '<space>c', ':<C-u>Telescope command_history<cr>', 
 vim.api.nvim_set_keymap('n', '<space>r', ':<C-u>Telescope oldfiles<cr>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<space>m', ':<C-u>Vista<cr>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<space>o', ':<C-u>Telescope treesitter<cr>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<space>g', ':<C-u>Telescope live_grep<cr>', {noremap = true, silent = true})
 
 vim.api.nvim_set_keymap('n', '<space>t', ':<C-u>Fern . -drawer<cr>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<space>R', ':<C-u>so $MYVIMRC<cr>:echo "reloaded vimrc."<cr>',
