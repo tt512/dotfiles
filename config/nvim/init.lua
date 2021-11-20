@@ -21,7 +21,7 @@ require'packer'.startup({
     use {'hrsh7th/nvim-cmp', requires = {'hrsh7th/cmp-nvim-lsp', 'hrsh7th/cmp-buffer'}}
 
     use {'nvim-telescope/telescope.nvim', requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}}
-    use {'lambdalisue/fern.vim', 'lambdalisue/fern-git-status.vim'}
+    use {'kyazdani42/nvim-tree.lua', requires = 'kyazdani42/nvim-web-devicons'}
     use 'liuchengxu/vista.vim'
     use 'hoob3rt/lualine.nvim'
     use {'akinsho/nvim-toggleterm.lua', config = function() require'toggleterm'.setup() end}
@@ -36,7 +36,7 @@ require'packer'.startup({
     use 'ojroques/vim-oscyank'
     use 'windwp/nvim-autopairs'
     use 'ggandor/lightspeed.nvim'
-    use 'tyru/eskk.vim'
+    use {'tyru/eskk.vim', config = function() vim.g['eskk#large_dictionary'] = '~/SKK-JISYO.XL' end}
     use 'ludovicchabant/vim-gutentags'
 
     use {"rcarriga/vim-ultest", requires = {"vim-test/vim-test"}, run = ":UpdateRemotePlugins"}
@@ -55,6 +55,9 @@ require'packer'.startup({
   end,
   config = {display = {open_fn = require'packer.util'.float}}
 })
+vim.cmd [[
+let g:eskk#large_dictionary = '~/SKK-JISYO.XL'
+]]
 -- }}}1
 -- General Settings {{{1
 vim.opt.virtualedit = 'all'
@@ -105,17 +108,17 @@ lsp_installer.on_server_ready(function(server)
     vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', {noremap = true, silent = true})
   end
 
-  local opts = {}
+  local opts = {
+    on_attach = on_attach,
+    capabilities = require'cmp_nvim_lsp'.update_capabilities(vim.lsp.protocol.make_client_capabilities())
+  }
 
   -- (optional) Customize the options passed to the server
   -- if server.name == "tsserver" then
   --     opts.root_dir = function() ... end
   -- end
+  if server.name == 'sumneko_lua' then opts.settings = {Lua = {diagnostics = {globals = {'vim'}}}} end
 
-  require'lspconfig'[server.name].setup {
-    on_attach = on_attach,
-    capabilities = require'cmp_nvim_lsp'.update_capabilities(vim.lsp.protocol.make_client_capabilities())
-  }
   -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
   server:setup(opts)
   vim.cmd [[ do User LspAttachBuffers ]]
@@ -148,17 +151,9 @@ cmp.setup({
   sources = {{name = 'nvim_lsp'}, {name = 'buffer'}}
 })
 require('nvim-autopairs').setup {}
--- you need setup cmp first put this after cmp.setup()
-require("nvim-autopairs.completion.cmp").setup({
-  map_cr = true, --  map <CR> on insert mode
-  map_complete = true, -- it will auto insert `(` (map_char) after select function or method item
-  auto_select = true, -- automatically select the first item
-  insert = false, -- use insert confirm behavior instead of replace
-  map_char = { -- modifies the function or method delimiter by filetypes
-    all = '(',
-    tex = '{'
-  }
-})
+-- If you want insert `(` after select function or method item
+local cmp_autopairs = require('nvim-autopairs.completion.cmp')
+cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done({map_char = {tex = ''}}))
 -- }}}1
 -- Debugging {{{1
 vim.api.nvim_set_keymap('n', '<F5>', [[<cmd>lua require'dap'.continue()<CR>]], {noremap = true, silent = true})
@@ -211,7 +206,12 @@ require'ultest'.setup {
 }
 -- }}}1
 -- Format {{{1
-require'format'.setup {lua = {{cmd = {'lua-format -i'}}}, rust = {{cmd = {'rustfmt'}}}, go = {{cmd = {'gofmt -w'}}}}
+require'format'.setup {
+  lua = {{cmd = {'lua-format -i'}}},
+  rust = {{cmd = {'rustfmt'}}},
+  go = {{cmd = {'gofmt -w'}}},
+  typescriptreact = {{cmd = {'prettier -w'}}}
+}
 vim.cmd [[
 augroup Format
   autocmd!
@@ -242,7 +242,7 @@ require'gitlinker'.setup {
 -- }}}1
 -- Lualine {{{1
 local nerdtree = require('lualine.extensions.nerdtree')
-local lualine_fern = {sections = vim.deepcopy(nerdtree.sections), filetypes = {'fern'}}
+local lualine_nvim_tree = {sections = vim.deepcopy(nerdtree.sections), filetypes = {'NvimTree'}}
 local lualine_vista = {sections = {lualine_a = {function() return vim.g.vista.provider end}}, filetypes = {'vista'}}
 local nearest_function = function() return vim.b.vista_nearest_method_or_function end
 require'lualine'.setup {
@@ -264,28 +264,14 @@ require'lualine'.setup {
     lualine_z = {}
   },
   tabline = {},
-  extensions = {lualine_fern, lualine_vista}
+  extensions = {lualine_nvim_tree, lualine_vista}
 }
 -- }}}1
--- Fern {{{1
-vim.g['fern#renderer#default#leaf_symbol'] = '   '
-vim.g['fern#renderer#default#collapsed_symbol'] = ' ⯈ '
-vim.g['fern#renderer#default#expanded_symbol'] = ' ⯆ '
-vim.g['fern#disable_viewer_hide_cursor'] = 1
-_G.init_fern = function()
-  vim.opt_local.number = false
-  vim.opt_local.relativenumber = false
-  vim.api.nvim_buf_set_keymap(0, 'n', '<Plug>(fern-my-open-or-toggle)', vim.fn['fern#smart#leaf'](
-                                  '<Plug>(fern-action-open)', '<Plug>(fern-action-expand)',
-                                  '<Plug>(fern-action-collapse)'), {})
-  vim.api.nvim_buf_set_keymap(0, 'n', '<2-LeftMouse>', '<Plug>(fern-my-open-or-toggle)', {})
-end
-vim.cmd [[
-augroup my_fern
-   au!
-   au Filetype fern call v:lua.init_fern()
-augroup END
-]]
+-- nvim-tree {{{
+vim.g.nvim_tree_show_icons = {git = 0, folders = 1, files = 0, folder_arrows = 0}
+vim.g.nvim_tree_git_hl = 1
+vim.g.nvim_tree_refresh_wait = 500
+require'nvim-tree'.setup {}
 -- }}}1
 -- Telescope {{{1
 local actions = require('telescope.actions')
@@ -324,7 +310,7 @@ vim.api.nvim_set_keymap('n', '<space>m', ':<C-u>Vista<cr>', {noremap = true, sil
 vim.api.nvim_set_keymap('n', '<space>o', ':<C-u>Telescope treesitter<cr>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<space>g', ':<C-u>Telescope live_grep<cr>', {noremap = true, silent = true})
 
-vim.api.nvim_set_keymap('n', '<space>t', ':<C-u>Fern . -drawer<cr>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<space>t', ':<C-u>NvimTreeToggle<cr>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<space>R', ':<C-u>so $MYVIMRC<cr>:echo "reloaded vimrc."<cr>',
                         {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<space>E', ':<C-u>e $MYVIMRC<cr>', {noremap = true, silent = true})
