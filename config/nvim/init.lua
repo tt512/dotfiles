@@ -12,37 +12,43 @@ require'packer'.startup({
   function(use, use_rocks)
     use 'wbthomason/packer.nvim'
 
+    -- LSP
     use 'neovim/nvim-lspconfig'
     use 'williamboman/nvim-lsp-installer'
-    use {'glepnir/lspsaga.nvim', config = function() require'lspsaga'.init_lsp_saga() end}
-    use "folke/lua-dev.nvim"
-    use "rafcamlet/nvim-luapad"
+    use {'tami5/lspsaga.nvim', config = function() require'lspsaga'.setup() end}
+    use 'jose-elias-alvarez/null-ls.nvim'
 
-    use {'hrsh7th/nvim-cmp', requires = {'hrsh7th/cmp-nvim-lsp', 'hrsh7th/cmp-buffer'}}
+    -- Completion
+    use {
+      'hrsh7th/nvim-cmp',
+      requires = {'hrsh7th/cmp-nvim-lsp', 'hrsh7th/cmp-nvim-lua', 'hrsh7th/cmp-buffer', 'hrsh7th/cmp-path'}
+    }
 
+    -- UI
     use {'nvim-telescope/telescope.nvim', requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}}}
     use {'kyazdani42/nvim-tree.lua', requires = 'kyazdani42/nvim-web-devicons'}
     use 'liuchengxu/vista.vim'
-    use 'hoob3rt/lualine.nvim'
+    use 'nvim-lualine/lualine.nvim'
     use {'akinsho/nvim-toggleterm.lua', config = function() require'toggleterm'.setup() end}
+    use 'kyazdani42/nvim-web-devicons'
 
-    use {'nvim-treesitter/nvim-treesitter', branch = '0.5-compat', run = ':TSUpdate'}
+    -- Treesitter
+    use {'nvim-treesitter/nvim-treesitter', run = ':TSUpdate'}
 
     use 'famiu/bufdelete.nvim'
     use {'lukas-reineke/indent-blankline.nvim'}
     use 'tpope/vim-sleuth'
-    use 'lukas-reineke/format.nvim'
-    use 'kyazdani42/nvim-web-devicons'
     use 'ojroques/vim-oscyank'
     use 'windwp/nvim-autopairs'
-    use 'ggandor/lightspeed.nvim'
     use {'tyru/eskk.vim', config = function() vim.g['eskk#large_dictionary'] = '~/SKK-JISYO.XL' end}
     use 'ludovicchabant/vim-gutentags'
 
+    -- Debugging
     use {"rcarriga/vim-ultest", requires = {"vim-test/vim-test"}, run = ":UpdateRemotePlugins"}
     use {"rcarriga/nvim-dap-ui", requires = {"mfussenegger/nvim-dap"}}
     use "Pocco81/DAPInstall.nvim"
 
+    -- Git
     use 'lambdalisue/gina.vim'
     use {'ruifm/gitlinker.nvim', requires = 'nvim-lua/plenary.nvim'}
     use {
@@ -51,13 +57,11 @@ require'packer'.startup({
       config = function() require'gitsigns'.setup() end
     }
 
+    -- Colorscheme
     use 'folke/tokyonight.nvim'
   end,
   config = {display = {open_fn = require'packer.util'.float}}
 })
-vim.cmd [[
-let g:eskk#large_dictionary = '~/SKK-JISYO.XL'
-]]
 -- }}}1
 -- General Settings {{{1
 vim.opt.virtualedit = 'all'
@@ -123,6 +127,25 @@ lsp_installer.on_server_ready(function(server)
   server:setup(opts)
   vim.cmd [[ do User LspAttachBuffers ]]
 end)
+
+local null_ls = require("null-ls")
+null_ls.setup {
+  -- you can reuse a shared lspconfig on_attach callback here
+  on_attach = function(client)
+    if client.resolved_capabilities.document_formatting then
+      vim.cmd([[
+        augroup LspFormatting
+            autocmd! * <buffer>
+            autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+        augroup END
+        ]])
+    end
+  end,
+  sources = {
+    null_ls.builtins.formatting.prettier, null_ls.builtins.formatting.lua_format, null_ls.builtins.formatting.rustfmt,
+    null_ls.builtins.formatting.gofmt
+  }
+}
 -- }}}1
 -- Completion {{{1
 vim.opt.completeopt = {'menuone', 'noselect'}
@@ -148,7 +171,7 @@ cmp.setup({
     ['<C-e>'] = cmp.mapping.close(),
     ['<CR>'] = cmp.mapping.confirm({select = true})
   },
-  sources = {{name = 'nvim_lsp'}, {name = 'buffer'}}
+  sources = {{name = 'nvim_lsp'}, {name = 'nvim_lua'}, {name = 'buffer'}, {name = 'path'}}
 })
 require('nvim-autopairs').setup {}
 -- If you want insert `(` after select function or method item
@@ -205,20 +228,6 @@ require'ultest'.setup {
   }
 }
 -- }}}1
--- Format {{{1
-require'format'.setup {
-  lua = {{cmd = {'lua-format -i'}}},
-  rust = {{cmd = {'rustfmt'}}},
-  go = {{cmd = {'gofmt -w'}}},
-  typescriptreact = {{cmd = {'prettier -w'}}}
-}
-vim.cmd [[
-augroup Format
-  autocmd!
-  autocmd BufWritePost * FormatWrite
-augroup END
-]]
--- }}}1
 -- OSCYank {{{1
 vim.cmd [[
 augroup OSCYank
@@ -268,7 +277,7 @@ require'lualine'.setup {
 }
 -- }}}1
 -- nvim-tree {{{
-vim.g.nvim_tree_show_icons = {git = 0, folders = 1, files = 0, folder_arrows = 0}
+vim.g.nvim_tree_show_icons = {git = 0, folders = 1, files = 1, folder_arrows = 0}
 vim.g.nvim_tree_git_hl = 1
 vim.g.nvim_tree_refresh_wait = 500
 require'nvim-tree'.setup {}
