@@ -16,13 +16,24 @@ require('packer').startup {
     use 'neovim/nvim-lspconfig'
     use 'williamboman/nvim-lsp-installer'
     use 'tami5/lspsaga.nvim'
-    use 'jose-elias-alvarez/null-ls.nvim'
+    use { 'jose-elias-alvarez/null-ls.nvim', requires = { 'nvim-lua/plenary.nvim' } }
+    use 'ray-x/lsp_signature.nvim'
+    use 'folke/trouble.nvim'
+    use 'folke/lua-dev.nvim'
 
     -- Completion
     use 'windwp/nvim-autopairs'
     use {
       'hrsh7th/nvim-cmp',
-      requires = { 'hrsh7th/cmp-nvim-lsp', 'hrsh7th/cmp-nvim-lua', 'hrsh7th/cmp-buffer', 'hrsh7th/cmp-path' },
+      requires = {
+        'hrsh7th/cmp-nvim-lsp',
+        'hrsh7th/cmp-nvim-lua',
+        'hrsh7th/cmp-buffer',
+        'hrsh7th/cmp-path',
+        'hrsh7th/cmp-cmdline',
+        'hrsh7th/cmp-vsnip',
+        'hrsh7th/vim-vsnip',
+      },
     }
 
     -- Treesitter
@@ -99,6 +110,14 @@ augroup CursorRestore
 augroup END
 ]]
 
+vim.cmd [[
+augroup FoldRestore
+  autocmd!
+  autocmd BufWinLeave * mkview
+  autocmd BufWinEnter * silent! loadview
+augroup END
+]]
+
 vim.cmd [[colorscheme tokyonight]]
 -- }}}1
 -- LSP {{{1
@@ -115,11 +134,8 @@ lsp_installer.on_server_ready(function(server)
   }
 
   -- (optional) Customize the options passed to the server
-  -- if server.name == "tsserver" then
-  --     opts.root_dir = function() ... end
-  -- end
   if server.name == 'sumneko_lua' then
-    opts.settings = { Lua = { diagnostics = { globals = { 'vim' } } } }
+    opts = require('lua-dev').setup { lspconfig = opts }
   end
 
   -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
@@ -149,12 +165,19 @@ null_ls.setup {
 }
 
 require('lspsaga').setup()
+require('lsp_signature').setup()
+require('trouble').setup()
 -- }}}1
 -- Completion {{{1
 vim.opt.completeopt = { 'menuone', 'noselect' }
-local cmp = require 'cmp'
 
+local cmp = require 'cmp'
 cmp.setup {
+  snippet = {
+    expand = function(args)
+      vim.fn['vsnip#anonymous'](args.body)
+    end,
+  },
   mapping = {
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
@@ -162,13 +185,27 @@ cmp.setup {
     ['<C-e>'] = cmp.mapping.close(),
     ['<CR>'] = cmp.mapping.confirm { select = true },
   },
-  sources = {
+  sources = cmp.config.sources({
     { name = 'nvim_lsp' },
+    { name = 'vsnip' },
     { name = 'nvim_lua' },
-    { name = 'buffer' },
+  }, {
     { name = 'path' },
-  },
+    { name = 'buffer' },
+  }),
 }
+
+require('cmp').setup.cmdline(':', {
+  sources = {
+    { name = 'cmdline' },
+  },
+})
+
+require('cmp').setup.cmdline('/', {
+  sources = {
+    { name = 'buffer' },
+  },
+})
 
 require('nvim-autopairs').setup {}
 -- If you want insert `(` after select function or method item
@@ -180,8 +217,6 @@ require('nvim-treesitter.configs').setup { ensure_installed = 'maintained', high
 -- }}}1
 -- UI {{{1
 -- Lualine {{{2
-local nerdtree = require 'lualine.extensions.nerdtree'
-local lualine_nvim_tree = { sections = vim.deepcopy(nerdtree.sections), filetypes = { 'NvimTree' } }
 local lualine_vista = {
   sections = { lualine_a = {
     function()
@@ -192,15 +227,12 @@ local lualine_vista = {
     'vista',
   },
 }
-local nearest_function = function()
-  return vim.b.vista_nearest_method_or_function
-end
 require('lualine').setup {
-  options = { theme = 'tokyonight', section_separators = '', component_separators = '│', icons_enabled = false },
+  options = { theme = 'tokyonight', section_separators = '', component_separators = '│' },
   sections = {
     lualine_a = { 'mode' },
     lualine_b = { 'branch' },
-    lualine_c = { 'filename', nearest_function },
+    lualine_c = { 'diagnostics', 'filename', 'b:vista_nearest_method_or_function' },
     lualine_x = { 'encoding', 'fileformat', 'filetype' },
     lualine_y = { 'progress' },
     lualine_z = { 'location' },
@@ -214,7 +246,7 @@ require('lualine').setup {
     lualine_z = {},
   },
   tabline = {},
-  extensions = { lualine_nvim_tree, lualine_vista },
+  extensions = { 'nvim-tree', 'toggleterm', 'quickfix', lualine_vista },
 }
 -- }}}2
 -- nvim-tree {{{2
@@ -241,6 +273,9 @@ require('telescope').setup {
 -- }}}2
 -- toggleterm.nvim {{{2
 require('toggleterm').setup()
+-- }}}2
+-- vista {{{2
+vim.g.vista_default_executive = 'nvim_lsp'
 -- }}}2
 -- }}}1
 -- Debugging {{{1

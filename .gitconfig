@@ -9,3 +9,5 @@
 	excludesfile = /home/tat/.gitignore_global
 [push]
 	default = simple
+[init]
+	defaultBranch = main
