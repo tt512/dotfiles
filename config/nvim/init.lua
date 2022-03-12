@@ -40,12 +40,16 @@ require('packer').startup {
     use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
 
     -- UI
-    use { 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/popup.nvim', 'nvim-lua/plenary.nvim' } }
-    use { 'kyazdani42/nvim-tree.lua', requires = 'kyazdani42/nvim-web-devicons' }
+    use { 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/plenary.nvim' } }
+    use {
+      'nvim-neo-tree/neo-tree.nvim',
+      requires = { 'nvim-lua/plenary.nvim', 'kyazdani42/nvim-web-devicons', 'MunifTanjim/nui.nvim' },
+      branch = 'v1.x',
+    }
     use 'liuchengxu/vista.vim'
-    use 'nvim-lualine/lualine.nvim'
+    use { 'nvim-lualine/lualine.nvim', requires = { 'kyazdani42/nvim-web-devicons', opt = true } }
     use 'akinsho/nvim-toggleterm.lua'
-    use 'kyazdani42/nvim-web-devicons'
+    use 'petertriho/nvim-scrollbar'
 
     -- Debugging
     use { 'rcarriga/vim-ultest', requires = { 'vim-test/vim-test' }, run = ':UpdateRemotePlugins' }
@@ -57,8 +61,9 @@ require('packer').startup {
     use 'lukas-reineke/indent-blankline.nvim'
     use 'tpope/vim-sleuth'
     use 'ojroques/vim-oscyank'
-    use 'tyru/eskk.vim'
+    use 'vim-skk/eskk.vim'
     use 'ludovicchabant/vim-gutentags'
+    use 'rafcamlet/nvim-luapad'
 
     -- Git
     use 'lambdalisue/gina.vim'
@@ -113,8 +118,8 @@ augroup END
 vim.cmd [[
 augroup FoldRestore
   autocmd!
-  autocmd BufWinLeave * mkview
-  autocmd BufWinEnter * silent! loadview
+  autocmd BufWinLeave *.* mkview
+  autocmd BufWinEnter *.* silent! loadview
 augroup END
 ]]
 
@@ -217,23 +222,47 @@ require('nvim-treesitter.configs').setup { ensure_installed = 'maintained', high
 -- }}}1
 -- UI {{{1
 -- Lualine {{{2
-local lualine_vista = {
-  sections = { lualine_a = {
-    function()
-      return vim.g.vista.provider
-    end,
-  } },
-  filetypes = {
-    'vista',
+local lualine_neotree = {
+  sections = {
+    lualine_a = { vim.deepcopy(require('lualine.extensions.nerdtree').sections) },
   },
+  filetypes = { 'neo-tree' },
 }
+
+local lualine_vista = {
+  sections = {
+    lualine_a = {
+      function()
+        return vim.g.vista.provider
+      end,
+    },
+  },
+  filetypes = { 'vista' },
+}
+
+local function lualine_eskk()
+  if vim.fn.mode() == 'i' and vim.g.loaded_eskk and vim.fn['eskk#is_enabled']() == 1 then
+    local mode = vim.fn['eskk#get_mode']()
+    return vim.g['eskk#statusline_mode_strings'][mode] or '??'
+  else
+    return ''
+  end
+end
+
 require('lualine').setup {
   options = { theme = 'tokyonight', section_separators = '', component_separators = '│' },
   sections = {
-    lualine_a = { 'mode' },
+    lualine_a = {
+      {
+        'mode',
+        fmt = function(str)
+          return str:sub(1, 1)
+        end,
+      },
+    },
     lualine_b = { 'branch' },
     lualine_c = { 'diagnostics', 'filename', 'b:vista_nearest_method_or_function' },
-    lualine_x = { 'encoding', 'fileformat', 'filetype' },
+    lualine_x = { 'encoding', 'fileformat', 'filetype', lualine_eskk },
     lualine_y = { 'progress' },
     lualine_z = { 'location' },
   },
@@ -246,14 +275,8 @@ require('lualine').setup {
     lualine_z = {},
   },
   tabline = {},
-  extensions = { 'nvim-tree', 'toggleterm', 'quickfix', lualine_vista },
+  extensions = { lualine_neotree, 'toggleterm', 'quickfix', lualine_vista },
 }
--- }}}2
--- nvim-tree {{{2
-vim.g.nvim_tree_show_icons = { git = 0, folders = 1, files = 1, folder_arrows = 0 }
-vim.g.nvim_tree_git_hl = 1
-vim.g.nvim_tree_refresh_wait = 500
-require('nvim-tree').setup {}
 -- }}}2
 -- Telescope {{{2
 local actions = require 'telescope.actions'
@@ -276,6 +299,32 @@ require('toggleterm').setup()
 -- }}}2
 -- vista {{{2
 vim.g.vista_default_executive = 'nvim_lsp'
+-- }}}2
+-- nvim-scrollbar {{{2
+local colors = require('tokyonight.colors').setup()
+require('scrollbar').setup {
+  handle = {
+    color = colors.blue0,
+  },
+}
+-- }}}2
+-- neo-tree.nvim {{{2
+vim.cmd [[
+hi link NeoTreeNormal NvimTreeNormal
+hi link NeoTreeNormalNC NvimTreeNormalNC
+hi link NeoTreeIndentMarker NvimTreeIndentMarker
+]]
+require('neo-tree').setup {
+  close_if_last_window = true,
+  enable_git_status = true,
+  enable_diagnostics = false,
+  filesystem = {
+    use_libuv_file_watcher = true,
+    window = {
+      width = 30,
+    },
+  },
+}
 -- }}}2
 -- }}}1
 -- Debugging {{{1
@@ -355,7 +404,7 @@ augroup END
 vim.g['eskk#large_dictionary'] = '~/SKK-JISYO.XL'
 
 require('indent_blankline').setup {
-  filetype_exclude = { 'help', 'fern', 'vista' },
+  filetype_exclude = { 'help', 'neo-tree', 'vista' },
   use_treesitter = true,
 }
 -- }}}1
@@ -388,7 +437,7 @@ vim.api.nvim_set_keymap('n', '<space>m', ':<C-u>Vista<cr>', { noremap = true, si
 vim.api.nvim_set_keymap('n', '<space>o', ':<C-u>Telescope treesitter<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<space>g', ':<C-u>Telescope live_grep<cr>', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap('n', '<space>t', ':<C-u>NvimTreeToggle<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<space>t', ':<C-u>NeoTreeShowToggle<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap(
   'n',
   '<space>R',
