@@ -70,5 +70,3 @@ bind generic <C-w><C-w> view-next
 
 bind main R !git rebase -i %(commit)
 bind diff R !git rebase -i %(commit)
-
-set diff-highlight = true
