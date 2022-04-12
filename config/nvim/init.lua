@@ -22,7 +22,6 @@ require('packer').startup {
     use 'folke/lua-dev.nvim'
 
     -- Completion
-    use 'windwp/nvim-autopairs'
     use {
       'hrsh7th/nvim-cmp',
       requires = {
@@ -35,9 +34,12 @@ require('packer').startup {
         'hrsh7th/vim-vsnip',
       },
     }
+    use 'windwp/nvim-autopairs'
+    use { 'windwp/nvim-ts-autotag' }
 
     -- Treesitter
     use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
+    use { 'yioneko/nvim-yati', requires = 'nvim-treesitter/nvim-treesitter' }
 
     -- UI
     use { 'nvim-telescope/telescope.nvim', requires = { 'nvim-lua/plenary.nvim' } }
@@ -48,6 +50,8 @@ require('packer').startup {
     }
     use 'liuchengxu/vista.vim'
     use { 'nvim-lualine/lualine.nvim', requires = { 'kyazdani42/nvim-web-devicons', opt = true } }
+    use { 'SmiteshP/nvim-gps', requires = 'nvim-treesitter/nvim-treesitter' }
+    use { 'akinsho/bufferline.nvim', tag = '*', requires = 'kyazdani42/nvim-web-devicons' }
     use 'akinsho/toggleterm.nvim'
     use 'petertriho/nvim-scrollbar'
 
@@ -63,13 +67,13 @@ require('packer').startup {
     use 'vim-skk/eskk.vim'
     use 'ludovicchabant/vim-gutentags'
     use 'rafcamlet/nvim-luapad'
-    use 'ap/vim-css-color'
     use {
       'norcalli/nvim-colorizer.lua',
       config = function()
         require('colorizer').setup()
       end,
     }
+    use 'ggandor/lightspeed.nvim'
 
     -- Git
     use 'lambdalisue/gina.vim'
@@ -77,7 +81,7 @@ require('packer').startup {
     use { 'lewis6991/gitsigns.nvim', requires = 'nvim-lua/plenary.nvim' }
 
     -- Colorscheme
-    use 'folke/tokyonight.nvim'
+    use 'EdenEast/nightfox.nvim'
   end,
   config = { display = { open_fn = require('packer.util').float } },
 }
@@ -129,7 +133,7 @@ augroup FoldRestore
 augroup END
 ]]
 
-vim.cmd [[colorscheme tokyonight]]
+vim.cmd [[colorscheme nordfox]]
 -- }}}1
 -- LSP {{{1
 local lsp_installer = require 'nvim-lsp-installer'
@@ -154,7 +158,16 @@ local enhance_server_opts = {
       client.resolved_capabilities.document_formatting = false
       client.resolved_capabilities.document_range_formatting = false
     end
+
     return require('lua-dev').setup { lspconfig = opts }
+  end,
+  ['tsserver'] = function(opts)
+    opts.on_attach = function(client, bufnr)
+      on_attach(client, bufnr)
+      client.resolved_capabilities.document_formatting = false
+      client.resolved_capabilities.document_range_formatting = false
+    end
+    return opts
   end,
 }
 
@@ -181,13 +194,13 @@ null_ls.setup {
       vim.cmd [[
         augroup LspFormatting
             autocmd! * <buffer>
-            autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync()
+            autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_sync(nil, 3000)
         augroup END
         ]]
     end
   end,
   sources = {
-    null_ls.builtins.formatting.prettier,
+    null_ls.builtins.formatting.prettier.with { prefer_local = 'node_modules/.bin' },
     null_ls.builtins.formatting.stylua,
     null_ls.builtins.formatting.rustfmt,
     null_ls.builtins.formatting.gofmt,
@@ -244,7 +257,11 @@ local cmp_autopairs = require 'nvim-autopairs.completion.cmp'
 cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done { map_char = { tex = '' } })
 -- }}}1
 -- Treesitter {{{1
-require('nvim-treesitter.configs').setup { ensure_installed = 'maintained', highlight = { enable = true } }
+require('nvim-treesitter.configs').setup {
+  highlight = { enable = true },
+  yati = { enable = true },
+  autotag = { enable = true },
+}
 -- }}}1
 -- UI {{{1
 -- Lualine {{{2
@@ -275,8 +292,10 @@ local function lualine_eskk()
   end
 end
 
+require('nvim-gps').setup()
+local gps = require 'nvim-gps'
 require('lualine').setup {
-  options = { theme = 'tokyonight', section_separators = '', component_separators = '│' },
+  options = { theme = 'nordfox', section_separators = '', component_separators = '│' },
   sections = {
     lualine_a = {
       {
@@ -287,7 +306,7 @@ require('lualine').setup {
       },
     },
     lualine_b = { 'branch' },
-    lualine_c = { 'diagnostics', 'filename', 'b:vista_nearest_method_or_function' },
+    lualine_c = { 'diagnostics', 'filename', { gps.get_location, cond = gps.is_available } },
     lualine_x = { 'encoding', 'fileformat', 'filetype', lualine_eskk },
     lualine_y = { 'progress' },
     lualine_z = { 'location' },
@@ -303,6 +322,9 @@ require('lualine').setup {
   tabline = {},
   extensions = { lualine_neotree, 'toggleterm', 'quickfix', lualine_vista },
 }
+-- }}}2
+-- bufferline.nvim {{{2
+require('bufferline').setup {}
 -- }}}2
 -- Telescope {{{2
 local actions = require 'telescope.actions'
@@ -327,19 +349,9 @@ require('toggleterm').setup()
 vim.g.vista_default_executive = 'nvim_lsp'
 -- }}}2
 -- nvim-scrollbar {{{2
-local colors = require('tokyonight.colors').setup()
-require('scrollbar').setup {
-  handle = {
-    color = colors.blue0,
-  },
-}
+require('scrollbar').setup {}
 -- }}}2
 -- neo-tree.nvim {{{2
-vim.cmd [[
-hi link NeoTreeNormal NvimTreeNormal
-hi link NeoTreeNormalNC NvimTreeNormalNC
-hi link NeoTreeIndentMarker NvimTreeIndentMarker
-]]
 require('neo-tree').setup {
   close_if_last_window = true,
   enable_git_status = true,
@@ -378,13 +390,6 @@ vim.api.nvim_set_keymap(
 )
 vim.api.nvim_set_keymap('n', '<leader>dr', [[<cmd>lua require'dap'.repl.open()<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>dl', [[<cmd>lua require'dap'.run_last()<CR>]], { noremap = true, silent = true })
-
-local dap_install = require 'dap-install'
-local dbg_list = require('dap-install.api.debuggers').get_installed_debuggers()
-
-for _, debugger in ipairs(dbg_list) do
-  dap_install.config(debugger)
-end
 
 local dap = require 'dap'
 dap.adapters.lldb = {
