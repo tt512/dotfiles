@@ -44,17 +44,16 @@ require('packer').startup {
     use {
       'nvim-neo-tree/neo-tree.nvim',
       requires = { 'nvim-lua/plenary.nvim', 'kyazdani42/nvim-web-devicons', 'MunifTanjim/nui.nvim' },
-      branch = 'v1.x',
+      branch = 'v2.x',
     }
     use 'liuchengxu/vista.vim'
     use { 'nvim-lualine/lualine.nvim', requires = { 'kyazdani42/nvim-web-devicons', opt = true } }
-    use 'akinsho/nvim-toggleterm.lua'
+    use 'akinsho/toggleterm.nvim'
     use 'petertriho/nvim-scrollbar'
 
     -- Debugging
     use { 'rcarriga/vim-ultest', requires = { 'vim-test/vim-test' }, run = ':UpdateRemotePlugins' }
     use { 'rcarriga/nvim-dap-ui', requires = { 'mfussenegger/nvim-dap' } }
-    use 'Pocco81/DAPInstall.nvim'
 
     -- Utility
     use 'famiu/bufdelete.nvim'
@@ -64,6 +63,13 @@ require('packer').startup {
     use 'vim-skk/eskk.vim'
     use 'ludovicchabant/vim-gutentags'
     use 'rafcamlet/nvim-luapad'
+    use 'ap/vim-css-color'
+    use {
+      'norcalli/nvim-colorizer.lua',
+      config = function()
+        require('colorizer').setup()
+      end,
+    }
 
     -- Git
     use 'lambdalisue/gina.vim'
@@ -128,24 +134,43 @@ vim.cmd [[colorscheme tokyonight]]
 -- LSP {{{1
 local lsp_installer = require 'nvim-lsp-installer'
 
-lsp_installer.on_server_ready(function(server)
-  local on_attach = function(client, bufnr)
-    vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
-  end
+local function on_attach(client, bufnr)
+  -- Set up buffer-local keymaps (vim.api.nvim_buf_set_keymap()), etc.
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
+end
 
+local enhance_server_opts = {
+  -- Provide settings that should only apply to the "eslintls" server
+  ['sumneko_lua'] = function(opts)
+    opts.settings = {
+      Lua = {
+        workspace = {
+          checkThirdParty = false,
+        },
+      },
+    }
+    opts.on_attach = function(client, bufnr)
+      on_attach(client, bufnr)
+      client.resolved_capabilities.document_formatting = false
+      client.resolved_capabilities.document_range_formatting = false
+    end
+    return require('lua-dev').setup { lspconfig = opts }
+  end,
+}
+
+lsp_installer.on_server_ready(function(server)
+  -- Specify the default options which we'll use to setup all servers
   local opts = {
     on_attach = on_attach,
     capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities()),
   }
 
-  -- (optional) Customize the options passed to the server
-  if server.name == 'sumneko_lua' then
-    opts = require('lua-dev').setup { lspconfig = opts }
+  if enhance_server_opts[server.name] then
+    -- Enhance the default opts with the server-specific ones
+    opts = enhance_server_opts[server.name](opts)
   end
 
-  -- This setup() function is exactly the same as lspconfig's setup function (:help lspconfig-quickstart)
   server:setup(opts)
-  vim.cmd [[ do User LspAttachBuffers ]]
 end)
 
 local null_ls = require 'null-ls'
@@ -166,6 +191,7 @@ null_ls.setup {
     null_ls.builtins.formatting.stylua,
     null_ls.builtins.formatting.rustfmt,
     null_ls.builtins.formatting.gofmt,
+    null_ls.builtins.formatting.clang_format,
   },
 }
 
@@ -360,7 +386,63 @@ for _, debugger in ipairs(dbg_list) do
   dap_install.config(debugger)
 end
 
+local dap = require 'dap'
+dap.adapters.lldb = {
+  type = 'executable',
+  command = '/usr/bin/lldb-vscode', -- adjust as needed
+  name = 'lldb',
+}
+dap.configurations.cpp = {
+  {
+    name = 'Launch',
+    type = 'lldb',
+    request = 'launch',
+    program = function()
+      return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+    end,
+    cwd = '${workspaceFolder}',
+    stopOnEntry = false,
+    args = {},
+
+    -- 💀
+    -- if you change `runInTerminal` to true, you might need to change the yama/ptrace_scope setting:
+    --
+    --    echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+    --
+    -- Otherwise you might get the following error:
+    --
+    --    Error on launch: Failed to attach to the target process
+    --
+    -- But you should be aware of the implications:
+    -- https://www.kernel.org/doc/html/latest/admin-guide/LSM/Yama.html
+
+    runInTerminal = false,
+
+    -- 💀
+    -- If you use `runInTerminal = true` and resize the terminal window,
+    -- lldb-vscode will receive a `SIGWINCH` signal which can cause problems
+    -- To avoid that uncomment the following option
+    -- See https://github.com/mfussenegger/nvim-dap/issues/236#issuecomment-1066306073
+    postRunCommands = { 'process handle -p true -s false -n false SIGWINCH' },
+  },
+}
+
+-- If you want to use this for rust and c, add something like this:
+
+dap.configurations.c = dap.configurations.cpp
+dap.configurations.rust = dap.configurations.cpp
+
 require('dapui').setup()
+local dapui = require 'dapui'
+dap.listeners.after.event_initialized['dapui_config'] = function()
+  dapui.open()
+end
+dap.listeners.before.event_terminated['dapui_config'] = function()
+  dapui.close()
+end
+dap.listeners.before.event_exited['dapui_config'] = function()
+  dapui.close()
+end
 
 require('ultest').setup {
   builders = {
@@ -431,13 +513,13 @@ vim.api.nvim_set_keymap('n', 'gn', ':<C-u>Lspsaga rename<cr>', { noremap = true,
 
 vim.api.nvim_set_keymap('n', '<space>b', ':<C-u>Telescope buffers<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<space>f', ':<C-u>Telescope find_files<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<space>c', ':<C-u>Telescope command_history<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<space>r', ':<C-u>Telescope oldfiles<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<space>m', ':<C-u>Vista<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<space>o', ':<C-u>Telescope treesitter<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<space>g', ':<C-u>Telescope live_grep<cr>', { noremap = true, silent = true })
 
+vim.api.nvim_set_keymap('n', '<space>m', ':<C-u>Vista<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<space>t', ':<C-u>NeoTreeShowToggle<cr>', { noremap = true, silent = true })
+
 vim.api.nvim_set_keymap(
   'n',
   '<space>R',
