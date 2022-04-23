@@ -26,11 +26,19 @@ zinit light-mode for \
     zdharma-continuum/zinit-annex-rust
 ### End of Zinit's installer chunk
 
+zinit ice wait lucid
 zinit light zsh-users/zsh-history-substring-search
+
+zinit ice wait lucid blockf atpull'zinit creinstall -q .' atload'zicompinit; zicdreplay'
 zinit light zsh-users/zsh-completions
+
+zinit ice wait lucid atload'_zsh_autosuggest_start'
 zinit light zsh-users/zsh-autosuggestions
 
-zinit ice pick"async.zsh" src"pure.zsh"
+zinit ice wait lucid
+zinit snippet OMZL::termsupport.zsh
+
+zinit ice compile'(pure|async).zsh' pick'async.zsh' src'pure.zsh'
 zinit light sindresorhus/pure
 # }}}
 # Keybind {{{
@@ -53,12 +61,12 @@ setopt share_history
 # }}}
 # Alias {{{
 case "${OSTYPE}" in
-freebsd*|darwin*)
-  alias ls="ls -G -w"
-  ;;
-linux*)
-  alias ls="ls --color"
-  ;;
+    freebsd*|darwin*)
+        alias ls="ls -G -w"
+        ;;
+    linux*)
+        alias ls="ls --color"
+        ;;
 esac
 alias ll='ls -l'
 alias lla='ls -la'
@@ -66,41 +74,11 @@ alias la='ls -AC'
 alias sl=ls
 
 function take() {
-  mkdir -p $1 && cd $_
+    mkdir -p $1 && cd $_
 }
 
 alias xclip='xclip -selection clipboard'
 # }}}
-# Envvar {{{
-export PAGER="less"
-export LESS="-g -i -M -R -F -X"
-export EDITOR=nvim
-
-export GOROOT="$HOME/.go"
-export GOPATH="$HOME/go"
-
-# deduplicate path values
-typeset -U PATH path
-export PATH="$HOME/bin:$GOPATH/bin:$PATH"
-# }}}
-# VTE title {{{
-# Write some info to terminal title.
-# This is seen when the shell prompts for input.
-function _vte_title_precmd {
-  print -Pn "\e]0;zsh%L %(1j,%j job%(2j|s|); ,)%~\a"
-}
-# Write command and args to terminal title.
-# This is seen while the shell waits for a command to complete.
-function _vte_title_preexec {
-  printf "\033]0;%s\a" "$1"
-}
-case $TERM in
-  xterm*|*rxvt*)
-    add-zsh-hook precmd  _vte_title_precmd
-    add-zsh-hook preexec _vte_title_preexec
-    ;;
-esac
-## }}}
 # Completion {{{
 # Menu Select
 zmodload zsh/complist
@@ -115,8 +93,6 @@ zstyle ':completion:*:*files' ignored-patterns '*?.o' '*?~' '*\#'
 zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
 zstyle ':completion:*' use-cache true
 zstyle ':completion::complete:*' cache-path $HOME/.cache/zsh
-
-autoload -Uz compinit; compinit
 # }}}
 
 # recompile if source is newer than .zwc
@@ -124,17 +100,3 @@ autoload -Uz compinit; compinit
 autoload -Uz zrecompile
 zrecompile -q .zshrc
 zrecompile -q .zcompdump
-
-# Profiling
-#
-# * loading time
-#     time ( zsh -i -c exit )
-# * profile zshrc loading
-#     ZRCPROF=1 zsh -i -c exit
-# * profile prompt printing
-#     zmodload zsh/zprof; zplof | less
-#
-# See also .zshenv
-if [[ $ZRCPROF -eq 1 ]]; then
-  zprof | less
-fi

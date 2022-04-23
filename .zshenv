@@ -1,3 +1,7 @@
-if [[ $ZRCPROF -eq 1 ]]; then
-  zmodload zsh/zprof && zprof
-fi
+export PAGER="less"
+export LESS="-g -i -M -R -F -X"
+export EDITOR=nvim
+
+typeset -U path PATH
+path=(~/.yarn/bin $path)
+export PATH
