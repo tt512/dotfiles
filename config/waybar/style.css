@@ -1,0 +1,29 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: HackGenNerd Console, sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: @theme_bg_color;
+    color: @theme_text_color;
+}
+
+#workspaces button {
+    padding: 0 2px;
+    border-bottom: 3px solid transparent;
+}
+
+#workspaces button.focused {
+    border-bottom: 3px solid @theme_selected_bg_color;
+}
+
+#mode, #clock, #pulseaudio, #battery, #tray {
+    padding: 0 5px;
+}
+
+#mode {
+    border-bottom: 3px solid @theme_selected_bg_color;
+}
