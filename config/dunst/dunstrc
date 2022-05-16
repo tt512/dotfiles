@@ -1,0 +1,12 @@
+[global]
+font = HackGenNerd Console 10
+
+markup = full
+
+icon_theme = Arc
+enable_recursive_icon_lookup = true
+
+frame_width = 1
+padding = 15
+
+dmenu = wofi --show dmenu
