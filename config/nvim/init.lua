@@ -20,6 +20,7 @@ require('packer').startup {
     use 'folke/trouble.nvim'
     use 'folke/lua-dev.nvim'
     use 'j-hui/fidget.nvim'
+    use 'simrat39/rust-tools.nvim'
 
     -- Completion
     use {
@@ -135,7 +136,8 @@ augroup END
 ]]
 -- }}}1
 -- LSP {{{1
-local lsp_installer = require 'nvim-lsp-installer'
+require('nvim-lsp-installer').setup {}
+local lspconfig = require 'lspconfig'
 
 local function on_attach(client, bufnr)
   -- Set up buffer-local keymaps (vim.api.nvim_buf_set_keymap()), etc.
@@ -155,59 +157,50 @@ local function on_attach(client, bufnr)
   }, { buffer = bufnr })
 end
 
-local enhance_server_opts = {
-  -- Provide settings that should only apply to the "eslintls" server
-  ['sumneko_lua'] = function(opts)
-    opts.settings = {
+local luadev = require('lua-dev').setup {
+  lspconfig = {
+    settings = {
       Lua = {
         workspace = {
           checkThirdParty = false,
         },
       },
-    }
-    opts.on_attach = function(client, bufnr)
+    },
+    on_attach = function(client, bufnr)
       on_attach(client, bufnr)
       client.resolved_capabilities.document_formatting = false
       client.resolved_capabilities.document_range_formatting = false
-    end
+    end,
+  },
+}
+lspconfig.sumneko_lua.setup(luadev)
 
-    return require('lua-dev').setup { lspconfig = opts }
-  end,
-  ['tsserver'] = function(opts)
-    opts.on_attach = function(client, bufnr)
-      on_attach(client, bufnr)
-      client.resolved_capabilities.document_formatting = false
-      client.resolved_capabilities.document_range_formatting = false
-    end
-    return opts
+lspconfig.tsserver.setup {
+  on_attach = function(client, bufnr)
+    on_attach(client, bufnr)
+    client.resolved_capabilities.document_formatting = false
+    client.resolved_capabilities.document_range_formatting = false
   end,
 }
 
-lsp_installer.on_server_ready(function(server)
-  -- Specify the default options which we'll use to setup all servers
-  local opts = {
+require('rust-tools').setup {
+  server = {
     on_attach = on_attach,
-    capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities()),
-  }
+  },
+}
 
-  if enhance_server_opts[server.name] then
-    -- Enhance the default opts with the server-specific ones
-    opts = enhance_server_opts[server.name](opts)
-  end
-
-  server:setup(opts)
-end)
-
+local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
 local null_ls = require 'null-ls'
 null_ls.setup {
   -- you can reuse a shared lspconfig on_attach callback here
   on_attach = function(client, bufnr)
-    if client.resolved_capabilities.document_formatting then
-      local id = vim.api.nvim_create_augroup('LspFormatting', { clear = true })
+    if client.supports_method 'textDocument/formatting' then
+      vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
       vim.api.nvim_create_autocmd('BufWritePre', {
-        group = id,
+        group = augroup,
         buffer = bufnr,
         callback = function()
+          -- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
           vim.lsp.buf.formatting_sync(nil, 3000)
         end,
       })
@@ -215,7 +208,6 @@ null_ls.setup {
   end,
   sources = {
     null_ls.builtins.formatting.stylua,
-    null_ls.builtins.formatting.rustfmt,
     null_ls.builtins.formatting.gofmt,
     null_ls.builtins.formatting.clang_format,
     null_ls.builtins.formatting.prettierd,
@@ -309,13 +301,6 @@ require('nvim-treesitter.configs').setup {
 -- }}}1
 -- UI {{{1
 -- Lualine {{{2
-local lualine_neotree = {
-  sections = {
-    lualine_a = { 'filetype' },
-  },
-  filetypes = { 'neo-tree' },
-}
-
 local lualine_vista = {
   sections = {
     lualine_a = {
@@ -364,7 +349,7 @@ require('lualine').setup {
     lualine_z = {},
   },
   tabline = {},
-  extensions = { lualine_neotree, 'toggleterm', 'quickfix', lualine_vista, 'symbols-outline' },
+  extensions = { 'neo-tree', 'toggleterm', 'quickfix', lualine_vista, 'symbols-outline' },
 }
 -- }}}2
 -- bufferline.nvim {{{2
@@ -447,6 +432,16 @@ vim.g.symbols_outline = {
 -- }}}2
 -- alpha-nvim {{{2
 require('alpha').setup(require('alpha.themes.startify').config)
+-- }}}2
+-- stickybuf {{{2
+require('stickybuf').setup {
+  filetype = {
+    ['neo-tree'] = 'filetype',
+    toggleterm = 'filetype',
+    ['Outline'] = 'filetype',
+    ['Trouble'] = 'filetype',
+  },
+}
 -- }}}2
 -- }}}1
 -- Debugging {{{1
@@ -658,5 +653,5 @@ require('which-key').register({
 
 require('which-key').register {
   [']b'] = { '<Cmd>BufferLineCycleNext<cr>', 'Next buffer' },
-  ['[b'] = { '<Cmd>BufferLineCycleNext<cr>', 'Previous buffer' },
+  ['[b'] = { '<Cmd>BufferLineCyclePrev<cr>', 'Previous buffer' },
 }
