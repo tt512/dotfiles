@@ -14,8 +14,9 @@ require('packer').startup {
 
     -- LSP
     use 'neovim/nvim-lspconfig'
-    use 'williamboman/nvim-lsp-installer'
-    use 'tami5/lspsaga.nvim'
+    use { 'williamboman/mason.nvim' }
+    use { 'williamboman/mason-lspconfig.nvim' }
+    use 'kkharji/lspsaga.nvim'
     use { 'jose-elias-alvarez/null-ls.nvim', requires = { 'nvim-lua/plenary.nvim' } }
     use 'folke/trouble.nvim'
     use 'folke/lua-dev.nvim'
@@ -64,8 +65,14 @@ require('packer').startup {
     use 'liuchengxu/vista.vim'
 
     -- Debugging
-    use { 'rcarriga/vim-ultest', requires = { 'vim-test/vim-test' }, run = ':UpdateRemotePlugins' }
+    use {
+      'nvim-neotest/neotest',
+      requires = { 'nvim-lua/plenary.nvim', 'nvim-treesitter/nvim-treesitter', 'antoinemadec/FixCursorHold.nvim' },
+    }
+    use 'nvim-neotest/neotest-python'
+
     use { 'rcarriga/nvim-dap-ui', requires = { 'mfussenegger/nvim-dap' } }
+    use 'mfussenegger/nvim-dap-python'
 
     -- Utility
     use 'famiu/bufdelete.nvim'
@@ -136,7 +143,8 @@ augroup END
 ]]
 -- }}}1
 -- LSP {{{1
-require('nvim-lsp-installer').setup {}
+require('mason').setup {}
+require('mason-lspconfig').setup {}
 local lspconfig = require 'lspconfig'
 
 local function on_attach(client, bufnr)
@@ -155,38 +163,43 @@ local function on_attach(client, bufnr)
     [']e'] = { '<Cmd>Lspsaga diagnostic_jump_next<cr>', 'Next diagnostic' },
     ['[e'] = { '<Cmd>Lspsaga diagnostic_jump_prev<cr>', 'Previous diagnostic' },
   }, { buffer = bufnr })
+
+  client.resolved_capabilities.document_formatting = false
+  client.resolved_capabilities.document_range_formatting = false
 end
 
-local luadev = require('lua-dev').setup {
-  lspconfig = {
-    settings = {
-      Lua = {
-        workspace = {
-          checkThirdParty = false,
-        },
-      },
-    },
-    on_attach = function(client, bufnr)
-      on_attach(client, bufnr)
-      client.resolved_capabilities.document_formatting = false
-      client.resolved_capabilities.document_range_formatting = false
-    end,
-  },
-}
-lspconfig.sumneko_lua.setup(luadev)
-
-lspconfig.tsserver.setup {
-  on_attach = function(client, bufnr)
-    on_attach(client, bufnr)
-    client.resolved_capabilities.document_formatting = false
-    client.resolved_capabilities.document_range_formatting = false
+require('mason-lspconfig').setup_handlers {
+  -- The first entry (without a key) will be the default handler
+  -- and will be called for each installed server that doesn't have
+  -- a dedicated handler.
+  function(server_name) -- default handler (optional)
+    require('lspconfig')[server_name].setup {
+      on_attach = on_attach,
+    }
   end,
-}
-
-require('rust-tools').setup {
-  server = {
-    on_attach = on_attach,
-  },
+  -- Next, you can provide targeted overrides for specific servers.
+  ['rust_analyzer'] = function()
+    require('rust-tools').setup {
+      server = {
+        on_attach = on_attach,
+      },
+    }
+  end,
+  ['sumneko_lua'] = function()
+    local luadev = require('lua-dev').setup {
+      lspconfig = {
+        settings = {
+          Lua = {
+            workspace = {
+              checkThirdParty = false,
+            },
+          },
+        },
+        on_attach = on_attach,
+      },
+    }
+    lspconfig.sumneko_lua.setup(luadev)
+  end,
 }
 
 local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
@@ -210,6 +223,8 @@ null_ls.setup {
     null_ls.builtins.formatting.stylua,
     null_ls.builtins.formatting.gofmt,
     null_ls.builtins.formatting.clang_format,
+    null_ls.builtins.formatting.autopep8,
+    null_ls.builtins.formatting.terraform_fmt,
     null_ls.builtins.formatting.prettierd,
     null_ls.builtins.diagnostics.eslint_d.with {
       diagnostics_postprocess = function(diagnostic)
@@ -396,7 +411,7 @@ require('neo-tree').setup {
 }
 -- }}}2
 -- symbols-outline {{{2
-vim.g.symbols_outline = {
+require('symbols-outline').setup {
   auto_preview = false,
   relative_width = false,
   width = 35,
@@ -528,32 +543,9 @@ dap.listeners.before.event_exited['dapui_config'] = function()
   dapui.close()
 end
 
-require('ultest').setup {
-  builders = {
-    ['go#gotest'] = function(cmd)
-      local args = {}
-      for i = 3, #cmd - 1, 1 do
-        local arg = cmd[i]
-        if vim.startswith(arg, '-') then
-          -- Delve requires test flags be prefix with 'test.'
-          arg = '-test.' .. string.sub(arg, 2)
-        end
-        args[#args + 1] = arg
-      end
-      return {
-        dap = {
-          type = 'go',
-          request = 'launch',
-          mode = 'test',
-          program = '${workspaceFolder}',
-          dlvToolPath = vim.fn.exepath 'dlv',
-          args = args,
-        },
-        parse_result = function(lines)
-          return lines[#lines] == 'FAIL' and 1 or 0
-        end,
-      }
-    end,
+require('neotest').setup {
+  adapters = {
+    require 'neotest-python',
   },
 }
 -- }}}1
