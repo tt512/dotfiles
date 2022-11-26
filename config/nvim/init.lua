@@ -16,12 +16,28 @@ require('packer').startup {
     use 'neovim/nvim-lspconfig'
     use { 'williamboman/mason.nvim' }
     use { 'williamboman/mason-lspconfig.nvim' }
-    use 'kkharji/lspsaga.nvim'
     use { 'jose-elias-alvarez/null-ls.nvim', requires = { 'nvim-lua/plenary.nvim' } }
-    use 'folke/trouble.nvim'
-    use 'folke/lua-dev.nvim'
+    use 'folke/neodev.nvim'
     use 'j-hui/fidget.nvim'
     use 'simrat39/rust-tools.nvim'
+    use { 'SmiteshP/nvim-navic', requires = 'neovim/nvim-lspconfig' }
+    use {
+      'folke/trouble.nvim',
+      requires = 'kyazdani42/nvim-web-devicons',
+      config = function()
+        require('trouble').setup {
+          mode = 'document_diagnostics',
+          auto_open = true,
+          auto_close = true,
+        }
+      end,
+    }
+    use {
+      'kosayoda/nvim-lightbulb',
+      config = function()
+        require('nvim-lightbulb').setup { autocmd = { enabled = true } }
+      end,
+    }
 
     -- Completion
     use {
@@ -45,14 +61,20 @@ require('packer').startup {
     use { 'yioneko/nvim-yati', requires = 'nvim-treesitter/nvim-treesitter' }
 
     -- UI
-    use { 'nvim-lualine/lualine.nvim', requires = { 'kyazdani42/nvim-web-devicons', opt = true } }
-    use { 'SmiteshP/nvim-gps', requires = 'nvim-treesitter/nvim-treesitter' }
-    use { 'akinsho/bufferline.nvim', tag = '*', requires = 'kyazdani42/nvim-web-devicons' }
+    use { 'nvim-lualine/lualine.nvim', requires = { 'kyazdani42/nvim-web-devicons' } }
+    use { 'akinsho/bufferline.nvim', tag = 'v2.*', requires = 'kyazdani42/nvim-web-devicons' }
     use 'petertriho/nvim-scrollbar'
     use 'stevearc/stickybuf.nvim'
-    use { 'goolord/alpha-nvim', requires = { 'kyazdani42/nvim-web-devicons' } }
+    use {
+      'goolord/alpha-nvim',
+      requires = { 'kyazdani42/nvim-web-devicons' },
+      config = function()
+        require('alpha').setup(require('alpha.themes.startify').config)
+      end,
+    }
     use {
       'nvim-telescope/telescope.nvim',
+      branch = '0.1.x',
       requires = { 'nvim-lua/plenary.nvim' },
     }
     use {
@@ -60,14 +82,27 @@ require('packer').startup {
       requires = { 'nvim-lua/plenary.nvim', 'kyazdani42/nvim-web-devicons', 'MunifTanjim/nui.nvim' },
       branch = 'v2.x',
     }
-    use 'akinsho/toggleterm.nvim'
+    use { 'akinsho/toggleterm.nvim', tag = '*' }
     use 'simrat39/symbols-outline.nvim'
     use 'liuchengxu/vista.vim'
+    use 'stevearc/dressing.nvim'
+    use {
+      'rcarriga/nvim-notify',
+      config = function()
+        vim.notify = require 'notify'
+      end,
+    }
+    use {
+      'luukvbaal/stabilize.nvim',
+      config = function()
+        require('stabilize').setup()
+      end,
+    }
 
     -- Debugging
     use {
       'nvim-neotest/neotest',
-      requires = { 'nvim-lua/plenary.nvim', 'nvim-treesitter/nvim-treesitter', 'antoinemadec/FixCursorHold.nvim' },
+      requires = { 'nvim-lua/plenary.nvim', 'nvim-treesitter/nvim-treesitter' },
     }
     use 'nvim-neotest/neotest-python'
 
@@ -141,8 +176,15 @@ augroup FoldRestore
   autocmd BufWinEnter *.* silent! loadview
 augroup END
 ]]
+
+local signs = { Error = ' ', Warn = ' ', Hint = ' ', Info = ' ' }
+for type, icon in pairs(signs) do
+  local hl = 'DiagnosticSign' .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = '' })
+end
 -- }}}1
 -- LSP {{{1
+require('neodev').setup {}
 require('mason').setup {}
 require('mason-lspconfig').setup {}
 local lspconfig = require 'lspconfig'
@@ -153,19 +195,23 @@ local function on_attach(client, bufnr)
 
   wk.register({
     g = {
-      h = { '<Cmd>Lspsaga lsp_finder<cr>', 'Show LSP finder' },
-      a = { '<Cmd>Lspsaga code_action<cr>', 'Show code action' },
-      r = { '<Cmd>Lspsaga rename<cr>', 'Rename' },
-      d = { '<Cmd>Lspsaga show_line_diagnostics<cr>', 'Show line diagnostics' },
+      D = { vim.lsp.buf.declaration, 'Go to declaration' },
+      d = { vim.lsp.buf.definition, 'Go to definition' },
+      i = { vim.lsp.buf.implementation, 'Go to implementation' },
+      a = { vim.lsp.buf.code_action, 'Show code action' },
+      n = { vim.lsp.buf.rename, 'Rename' },
+      r = { vim.lsp.buf.references, 'Show references' },
+      z = { vim.diagnostic.open_float, 'Show line diagnostics' },
     },
-    ['K'] = { '<Cmd>Lspsaga hover_doc<cr>', 'Show hover Doc' },
-    ['<C-k>'] = { '<Cmd>Lspsaga signature_help<cr>', 'Show signature help' },
-    [']e'] = { '<Cmd>Lspsaga diagnostic_jump_next<cr>', 'Next diagnostic' },
-    ['[e'] = { '<Cmd>Lspsaga diagnostic_jump_prev<cr>', 'Previous diagnostic' },
+    K = { vim.lsp.buf.hover, 'Show hover doc' },
+    ['<C-k>'] = { vim.lsp.buf.signature_help, 'Show signature help' },
   }, { buffer = bufnr })
 
-  client.resolved_capabilities.document_formatting = false
-  client.resolved_capabilities.document_range_formatting = false
+  local navic = require 'nvim-navic'
+  navic.attach(client, bufnr)
+
+  client.server_capabilities.documentFormattingProvider = false
+  client.server_capabilities.documentRangeFormattingProvider = false
 end
 
 require('mason-lspconfig').setup_handlers {
@@ -186,35 +232,32 @@ require('mason-lspconfig').setup_handlers {
     }
   end,
   ['sumneko_lua'] = function()
-    local luadev = require('lua-dev').setup {
+    lspconfig.sumneko_lua.setup {
       lspconfig = {
         settings = {
           Lua = {
-            workspace = {
-              checkThirdParty = false,
+            completion = {
+              callSnippet = 'Replace',
             },
           },
         },
-        on_attach = on_attach,
       },
+      on_attach = on_attach,
     }
-    lspconfig.sumneko_lua.setup(luadev)
   end,
 }
 
-local augroup = vim.api.nvim_create_augroup('LspFormatting', {})
+local augroup = vim.api.nvim_create_augroup('LspFormatting', { clear = true })
 local null_ls = require 'null-ls'
 null_ls.setup {
   -- you can reuse a shared lspconfig on_attach callback here
   on_attach = function(client, bufnr)
     if client.supports_method 'textDocument/formatting' then
-      vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
       vim.api.nvim_create_autocmd('BufWritePre', {
         group = augroup,
         buffer = bufnr,
         callback = function()
-          -- on 0.8, you should use vim.lsp.buf.format({ bufnr = bufnr }) instead
-          vim.lsp.buf.formatting_sync(nil, 3000)
+          vim.lsp.buf.format { bufnr = bufnr }
         end,
       })
     end
@@ -235,8 +278,6 @@ null_ls.setup {
   },
 }
 
-require('lspsaga').setup()
-require('trouble').setup()
 require('fidget').setup()
 -- }}}1
 -- Completion {{{1
@@ -336,8 +377,7 @@ local function lualine_eskk()
   end
 end
 
-require('nvim-gps').setup()
-local gps = require 'nvim-gps'
+local navic = require 'nvim-navic'
 require('lualine').setup {
   options = { theme = 'nordfox', section_separators = '', component_separators = '│', globalstatus = true },
   sections = {
@@ -350,7 +390,7 @@ require('lualine').setup {
       },
     },
     lualine_b = { 'branch' },
-    lualine_c = { 'diagnostics', 'filename', { gps.get_location, cond = gps.is_available } },
+    lualine_c = { 'diagnostics', 'filename' },
     lualine_x = { 'encoding', 'fileformat', 'filetype', lualine_eskk },
     lualine_y = { 'progress' },
     lualine_z = { 'location' },
@@ -364,6 +404,8 @@ require('lualine').setup {
     lualine_z = {},
   },
   tabline = {},
+  winbar = { lualine_c = { { navic.get_location, cond = navic.is_available } } },
+  inactive_winbar = { lualine_c = { { navic.get_location, cond = navic.is_available } } },
   extensions = { 'neo-tree', 'toggleterm', 'quickfix', lualine_vista, 'symbols-outline' },
 }
 -- }}}2
@@ -444,9 +486,6 @@ require('symbols-outline').setup {
     TypeParameter = { icon = '', hl = 'TSParameter' },
   },
 }
--- }}}2
--- alpha-nvim {{{2
-require('alpha').setup(require('alpha.themes.startify').config)
 -- }}}2
 -- stickybuf {{{2
 require('stickybuf').setup {
