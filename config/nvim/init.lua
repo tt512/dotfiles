@@ -20,15 +20,12 @@ require('packer').startup {
     use 'folke/neodev.nvim'
     use 'j-hui/fidget.nvim'
     use 'simrat39/rust-tools.nvim'
-    use { 'SmiteshP/nvim-navic', requires = 'neovim/nvim-lspconfig' }
     use {
       'folke/trouble.nvim',
       requires = 'kyazdani42/nvim-web-devicons',
       config = function()
         require('trouble').setup {
           mode = 'document_diagnostics',
-          auto_open = true,
-          auto_close = true,
         }
       end,
     }
@@ -58,11 +55,58 @@ require('packer').startup {
 
     -- Treesitter
     use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-    use { 'yioneko/nvim-yati', requires = 'nvim-treesitter/nvim-treesitter' }
 
     -- UI
     use { 'nvim-lualine/lualine.nvim', requires = { 'kyazdani42/nvim-web-devicons' } }
     use { 'akinsho/bufferline.nvim', tag = 'v2.*', requires = 'kyazdani42/nvim-web-devicons' }
+    use {
+      'utilyre/barbecue.nvim',
+      tag = '*',
+      requires = {
+        'SmiteshP/nvim-navic',
+        'nvim-tree/nvim-web-devicons', -- optional dependency
+      },
+      after = 'nvim-web-devicons', -- keep this if you're using NvChad
+      config = function()
+        require('barbecue').setup {
+          attach_navic = false,
+          show_dirname = false,
+          show_basename = false,
+          show_modified = false,
+          symbols = {
+            separator = '',
+          },
+          kinds = {
+            File = '',
+            Module = '',
+            Namespace = '',
+            Package = '',
+            Class = '',
+            Method = '',
+            Property = '',
+            Field = 'פּ',
+            Constructor = '',
+            Enum = '',
+            Interface = '',
+            Function = '',
+            Variable = '',
+            Constant = '',
+            String = '',
+            Number = '',
+            Boolean = '',
+            Array = '',
+            Object = '⦿',
+            Key = '',
+            Null = 'NULL',
+            EnumMember = '',
+            Struct = '',
+            Event = '⚡',
+            Operator = '',
+            TypeParameter = '',
+          },
+        }
+      end,
+    }
     use 'petertriho/nvim-scrollbar'
     use 'stevearc/stickybuf.nvim'
     use {
@@ -207,8 +251,9 @@ local function on_attach(client, bufnr)
     ['<C-k>'] = { vim.lsp.buf.signature_help, 'Show signature help' },
   }, { buffer = bufnr })
 
-  local navic = require 'nvim-navic'
-  navic.attach(client, bufnr)
+  if client.server_capabilities['documentSymbolProvider'] then
+    require('nvim-navic').attach(client, bufnr)
+  end
 
   client.server_capabilities.documentFormattingProvider = false
   client.server_capabilities.documentRangeFormattingProvider = false
@@ -351,23 +396,11 @@ cmp.event:on('confirm_done', cmp_autopairs.on_confirm_done { map_char = { tex = 
 -- Treesitter {{{1
 require('nvim-treesitter.configs').setup {
   highlight = { enable = true },
-  yati = { enable = true },
   autotag = { enable = true },
 }
 -- }}}1
 -- UI {{{1
 -- Lualine {{{2
-local lualine_vista = {
-  sections = {
-    lualine_a = {
-      function()
-        return vim.g.vista.provider
-      end,
-    },
-  },
-  filetypes = { 'vista' },
-}
-
 local function lualine_eskk()
   if vim.fn.mode() == 'i' and vim.g.loaded_eskk and vim.fn['eskk#is_enabled']() == 1 then
     local mode = vim.fn['eskk#get_mode']()
@@ -377,7 +410,6 @@ local function lualine_eskk()
   end
 end
 
-local navic = require 'nvim-navic'
 require('lualine').setup {
   options = { theme = 'nordfox', section_separators = '', component_separators = '│', globalstatus = true },
   sections = {
@@ -404,9 +436,7 @@ require('lualine').setup {
     lualine_z = {},
   },
   tabline = {},
-  winbar = { lualine_c = { { navic.get_location, cond = navic.is_available } } },
-  inactive_winbar = { lualine_c = { { navic.get_location, cond = navic.is_available } } },
-  extensions = { 'neo-tree', 'toggleterm', 'quickfix', lualine_vista, 'symbols-outline' },
+  extensions = { 'neo-tree', 'toggleterm', 'quickfix', 'symbols-outline' },
 }
 -- }}}2
 -- bufferline.nvim {{{2
@@ -457,6 +487,7 @@ require('symbols-outline').setup {
   auto_preview = false,
   relative_width = false,
   width = 35,
+  symbol_blacklist = { 'String', 'Number', 'Variable' },
   symbols = {
     File = { icon = '', hl = 'TSURI' },
     Module = { icon = '', hl = 'TSNamespace' },
@@ -489,12 +520,20 @@ require('symbols-outline').setup {
 -- }}}2
 -- stickybuf {{{2
 require('stickybuf').setup {
-  filetype = {
-    ['neo-tree'] = 'filetype',
-    toggleterm = 'filetype',
-    ['Outline'] = 'filetype',
-    ['Trouble'] = 'filetype',
-  },
+  get_auto_pin = function(bufnr)
+    local pin_filetypes = {
+      'Outline',
+      'toggleterm',
+    }
+    local filetype = vim.bo[bufnr].filetype
+    for _, t in pairs(pin_filetypes) do
+      if filetype == t then
+        return 'filetype'
+      end
+    end
+
+    return require('stickybuf').should_auto_pin(bufnr)
+  end,
 }
 -- }}}2
 -- }}}1
@@ -593,7 +632,10 @@ require('neotest').setup {
 vim.cmd [[
 augroup OSCYank
   autocmd!
-  autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | OSCYankReg " | endif
+  autocmd TextYankPost *
+    \ if v:event.operator is 'y' && v:event.regname is '+' |
+    \ execute 'OSCYankRegister +' |
+    \ endif
 augroup END
 ]]
 
@@ -634,7 +676,7 @@ require('gitlinker').setup {
       vim.fn.setreg('+', url)
       local backup = vim.g.oscyank_silent
       vim.g.oscyank_silent = true
-      vim.cmd [[OSCYankReg +]]
+      vim.cmd [[OSCYankRegister +]]
       vim.g.oscyank_silent = backup
     end,
   },
